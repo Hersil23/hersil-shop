@@ -28,7 +28,7 @@ if (isLoggedIn()) {
         <!-- Formulario de Login -->
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 space-y-6 border border-slate-200 dark:border-slate-700">
             
-            <form action="<?php echo BASE_URL; ?>/controllers/authcontroller.php?action=login" method="POST" class="space-y-6">
+            <form action="http://localhost/hersil_php/controllers/authcontroller.php?action=login" method="POST" class="space-y-6">
                 
                 <!-- Email -->
                 <div>
