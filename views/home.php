@@ -148,10 +148,17 @@ $categories = $categoryModel->getActiveCategories();
             <?php foreach ($featuredProducts as $product): ?>
                 <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all hover:shadow-2xl">
                     <!-- Imagen del producto -->
-                    <div class="h-48 md:h-56 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
-                        <i class="fas fa-laptop text-5xl md:text-6xl text-slate-400 dark:text-slate-500"></i>
+            <div class="h-48 md:h-56 bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                <?php if (!empty($product['imagen_url'])): ?>
+                    <img src="<?php echo htmlspecialchars($product['imagen_url']); ?>" 
+                        alt="<?php echo htmlspecialchars($product['nombre']); ?>"
+                        class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
+                <?php else: ?>
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600">
+                        <i class="fas fa-box text-5xl md:text-6xl text-slate-400 dark:text-slate-500"></i>
                     </div>
-                    
+                <?php endif; ?>
+            </div>                    
                     <!-- Contenido -->
                     <div class="p-4 md:p-5">
                         <!-- Categoría -->
