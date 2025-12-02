@@ -83,30 +83,98 @@
             </div>
 
             <!-- Copyright -->
-            <div class="border-t border-slate-200 dark:border-slate-800 pt-6 text-center">
-                <p class="text-sm text-slate-600 dark:text-slate-400">
-                    &copy; <?php echo date('Y'); ?> Hersil Shop. Todos los derechos reservados.
-                </p>
-                <p class="text-xs text-slate-500 dark:text-slate-500 mt-2">
-                    Desarrollado por Herasi Silva
-                </p>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-6">
+                <div class="text-center space-y-4">
+                    <!-- Copyright principal -->
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        &copy; <?php echo date('Y'); ?> Hersil Shop. Todos los derechos reservados.
+                    </p>
+                    
+                    <!-- Desarrollador -->
+                    <div class="flex flex-col items-center space-y-3">
+                        <p class="text-sm text-slate-500 dark:text-slate-500">
+                            Desarrollado por <a href="https://herasi.dev" target="_blank" rel="noopener" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">@herasi.dev</a>
+                        </p>
+                        
+                        <!-- Redes sociales del desarrollador -->
+                        <div class="flex items-center space-x-4">
+                            <a href="https://www.instagram.com/herasi.dev" target="_blank" rel="noopener" 
+                               class="group flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                                    <i class="fab fa-instagram"></i>
+                                </div>
+                                <span class="text-xs font-medium">@herasi.dev</span>
+                            </a>
+                            
+                            <a href="https://www.tiktok.com/@herasi.dev" target="_blank" rel="noopener" 
+                               class="group flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                                    <i class="fab fa-tiktok"></i>
+                                </div>
+                                <span class="text-xs font-medium">@herasi.dev</span>
+                            </a>
+                            
+                            <a href="https://herasi.dev" target="_blank" rel="noopener" 
+                               class="group flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <span class="text-xs font-medium">herasi.dev</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
     </footer>
 
     <!-- JavaScript para menú móvil y tema -->
     <script src="<?php echo BASE_URL; ?>/public/js/theme.js"></script>
     <script>
-        // Toggle menú móvil
-        document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
+        // Toggle menú móvil desde la derecha
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
 
-        // Cerrar menú móvil al hacer clic en un enlace
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('mobile-menu').classList.add('hidden');
+            function openMobileMenu() {
+                console.log('Abriendo menú móvil');
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenuOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMobileMenu() {
+                console.log('Cerrando menú móvil');
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenuOverlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openMobileMenu();
+                });
+            }
+
+            if (mobileMenuClose) {
+                mobileMenuClose.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    closeMobileMenu();
+                });
+            }
+
+            if (mobileMenuOverlay) {
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+            }
+
+            // Cerrar menú al hacer clic en un enlace
+            const menuLinks = document.querySelectorAll('#mobile-menu a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    setTimeout(closeMobileMenu, 100);
+                });
             });
         });
     </script>

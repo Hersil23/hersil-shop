@@ -210,7 +210,7 @@ $categories = $categoryModel->getActiveCategories();
                 Regístrate ahora y obtén acceso a ofertas exclusivas y los mejores productos del mercado
             </p>
             <a href="<?php echo BASE_URL; ?>/register" 
-              class="inline-block bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg text-sm md:text-base">
+            class="inline-block bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg text-sm md:text-base">
                 <i class="fas fa-rocket mr-2"></i>Comenzar Ahora
             </a>
         </div>

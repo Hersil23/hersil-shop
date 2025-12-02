@@ -51,10 +51,10 @@ $current_page = $_SERVER['REQUEST_URI'];
 </head>
 <body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
     
-    <!-- Navbar -->
+   <!-- Navbar -->
     <nav class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
         <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-20 md:h-24">
                 
                 <!-- Logo -->
                 <a href="<?php echo BASE_URL; ?>/" class="flex items-center space-x-3">
@@ -129,7 +129,7 @@ $current_page = $_SERVER['REQUEST_URI'];
                         </a>
                     <?php endif; ?>
 
-                    <!-- Toggle Tema -->
+                    <!-- Toggle Tema Desktop -->
                     <button onclick="toggleTheme()" id="theme-toggle" 
                             class="ml-2 p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
                         <span id="theme-icon">
@@ -138,51 +138,84 @@ $current_page = $_SERVER['REQUEST_URI'];
                     </button>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
+                <!-- Mobile: Botones Toggle Tema + Hamburguesa -->
+                <div class="md:hidden flex items-center space-x-2">
+                    <!-- Toggle Tema Mobile -->
+                    <button onclick="toggleTheme()" id="theme-toggle-mobile" 
+                            class="p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                        <span id="theme-icon-mobile">
+                            <i class="fas fa-moon text-lg"></i>
+                        </span>
+                    </button>
+                    
+                    <!-- Hamburguesa -->
+                    <button id="mobile-menu-button" class="p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden pb-4">
-                <a href="<?php echo BASE_URL; ?>/" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                    <i class="fas fa-home mr-2"></i>Inicio
-                </a>
-                <a href="<?php echo BASE_URL; ?>/productos" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                    <i class="fas fa-shopping-bag mr-2"></i>Productos
-                </a>
-                
-                <?php if ($isLoggedIn): ?>
-                    <?php if ($isAdmin): ?>
-                        <div class="border-t border-slate-200 dark:border-slate-700 my-2"></div>
-                        <p class="px-4 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400">Administración</p>
-                        <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                            <i class="fas fa-users mr-2"></i>Usuarios
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/admin/categorias" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                            <i class="fas fa-tags mr-2"></i>Categorías
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/admin/productos" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                            <i class="fas fa-box mr-2"></i>Productos
-                        </a>
-                    <?php endif; ?>
+            <!-- Mobile Menu Overlay (desde la derecha) -->
+            <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"></div>
+            
+            <!-- Mobile Menu (slide desde la derecha) -->
+            <div id="mobile-menu" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-900 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+                <!-- Header del menú -->
+                <div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+                    <h3 class="text-lg font-bold">Menú</h3>
+                    <button id="mobile-menu-close" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Contenido del menú -->
+                <div class="p-4">
+                    <a href="<?php echo BASE_URL; ?>/" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                        <i class="fas fa-home mr-3 w-5"></i>Inicio
+                    </a>
+                    <a href="<?php echo BASE_URL; ?>/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                        <i class="fas fa-shopping-bag mr-3 w-5"></i>Productos
+                    </a>
                     
-                    <div class="border-t border-slate-200 dark:border-slate-700 my-2"></div>
-                    <a href="<?php echo BASE_URL; ?>/perfil" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                        <i class="fas fa-user mr-2"></i>Mi Perfil
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/controllers/authcontroller.php?action=logout" class="block px-4 py-3 text-red-600 dark:text-red-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-                    </a>
-                <?php else: ?>
-                    <a href="<?php echo BASE_URL; ?>/login" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/register" class="block px-4 py-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                        <i class="fas fa-user-plus mr-2"></i>Registrarse
-                    </a>
-                <?php endif; ?>
+                    <?php if ($isLoggedIn): ?>
+                        <?php if ($isAdmin): ?>
+                            <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
+                                <p class="px-4 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400">Administración</p>
+                                <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                    <i class="fas fa-users mr-3 w-5"></i>Usuarios
+                                </a>
+                                <a href="<?php echo BASE_URL; ?>/admin/categorias" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                    <i class="fas fa-tags mr-3 w-5"></i>Categorías
+                                </a>
+                                <a href="<?php echo BASE_URL; ?>/admin/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                    <i class="fas fa-box mr-3 w-5"></i>Productos
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
+                            <div class="px-4 py-2 mb-2">
+                                <p class="font-semibold"><?php echo $currentUser['nombre'] . ' ' . $currentUser['apellido']; ?></p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400"><?php echo $currentUser['correo']; ?></p>
+                            </div>
+                            <a href="<?php echo BASE_URL; ?>/perfil" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                <i class="fas fa-user mr-3 w-5"></i>Mi Perfil
+                            </a>
+                            <a href="<?php echo BASE_URL; ?>/controllers/authcontroller.php?action=logout" class="flex items-center px-4 py-3 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-3 w-5"></i>Cerrar Sesión
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
+                            <a href="<?php echo BASE_URL; ?>/login" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                <i class="fas fa-sign-in-alt mr-3 w-5"></i>Iniciar Sesión
+                            </a>
+                            <a href="<?php echo BASE_URL; ?>/register" class="flex items-center px-4 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors">
+                                <i class="fas fa-user-plus mr-3 w-5"></i>Registrarse
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </nav>

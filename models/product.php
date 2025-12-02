@@ -16,6 +16,7 @@ class Product {
     public $id_categoria;
     public $nombre;
     public $descripcion;
+    public $imagen_url;
     public $stock;
     public $precio;
     public $eliminado;
