@@ -159,6 +159,29 @@ class User {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Obtener todos los usuarios (alias para compatibilidad)
+    public function getAllUsers() {
+        return $this->getAll();
+    }
+
+    // Buscar usuarios
+    public function search($searchTerm) {
+        $query = "SELECT id, nombre, apellido, correo, rol, fecha_registro 
+                  FROM " . $this->table . " 
+                  WHERE eliminado = 0 
+                  AND (nombre LIKE :search 
+                       OR apellido LIKE :search 
+                       OR correo LIKE :search)
+                  ORDER BY fecha_registro DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $searchParam = "%{$searchTerm}%";
+        $stmt->bindParam(':search', $searchParam);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // Generar código de verificación para recuperar contraseña
     public function generateVerificationCode() {
         $code = sprintf("%06d", mt_rand(1, 999999));
