@@ -7,30 +7,3 @@
     
     RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>
-```
-
-**IMPORTANTE:** 
-- NO copies el bloque de código completo desde mi mensaje
-- Copia línea por línea
-- O mejor aún, **escríbelo manualmente**
-
-Debe quedar así (te lo escribo sin formato):
-```
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /hersil_php/public/
-    
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    
-    RewriteRule ^(.*)$ index.php [L,QSA]
-</IfModule>
-```
-
-**Guarda (Ctrl + S)**
-
-**Reinicia Apache** (Stop → Start)
-
-**Prueba:**
-```
-http://localhost/hersil_php/public/login

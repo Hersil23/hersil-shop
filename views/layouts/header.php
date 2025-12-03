@@ -57,7 +57,7 @@ $current_page = $_SERVER['REQUEST_URI'];
             <div class="flex items-center justify-between h-20 md:h-24">
                 
                 <!-- Logo -->
-                <a href="<?php echo BASE_URL; ?>/" class="flex items-center space-x-3">
+                <a href="<?php echo BASE_URL; ?>/public/" class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-800 to-blue-600 rounded-lg flex items-center justify-center">
                         <i class="fas fa-bolt text-white text-xl"></i>
                     </div>
@@ -66,8 +66,7 @@ $current_page = $_SERVER['REQUEST_URI'];
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-1">
-                    <a href="<?php echo BASE_URL; ?>/" 
-                       class="px-4 py-2 rounded-lg transition-colors <?php echo (strpos($current_page, '/inicio') !== false || $current_page === '/' || strpos($current_page, '/home') !== false) ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
+                    <a href="<?php echo BASE_URL; ?>/public/" class="flex items-center px-4 py-2 rounded-lg transition-colors <?php echo (strpos($current_page, '/inicio') !== false || $current_page === '/' || strpos($current_page, '/home') !== false) ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
                         <i class="fas fa-home mr-2"></i>Inicio
                     </a>
                     

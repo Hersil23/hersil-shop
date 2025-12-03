@@ -61,7 +61,7 @@ class AuthController {
             if (!empty($errors)) {
                 $_SESSION['errors'] = $errors;
                 $_SESSION['form_data'] = $_POST;
-                redirect('/register');
+                redirect('/public/register');
                 return;
             }
 
@@ -77,10 +77,10 @@ class AuthController {
 
                 // Mensaje de éxito
                 $_SESSION['success'] = "¡Registro exitoso! Por favor inicia sesión.";
-                redirect('/login');
+                redirect('/public/login');
             } else {
                 $_SESSION['error'] = "Error al registrar el usuario. Intenta de nuevo.";
-                redirect('/register');
+                redirect('/public/register');
             }
         }
     }
@@ -95,7 +95,7 @@ class AuthController {
             // Validaciones
             if (empty($correo) || empty($contrasena)) {
                 $_SESSION['error'] = "Todos los campos son requeridos";
-                redirect('/login');
+                redirect('/public/login');
                 return;
             }
 
@@ -113,13 +113,13 @@ class AuthController {
 
                 // Redirigir según el rol
                 if ($this->userModel->rol === 'administrador') {
-                    redirect('/admin/usuarios');
+                    redirect('/public/admin/usuarios');
                 } else {
-                    redirect('/productos');
+                    redirect('/public/productos');
                 }
             } else {
                 $_SESSION['error'] = "Correo o contraseña incorrectos";
-                redirect('/login');
+                redirect('/public/login');
             }
         }
     }
@@ -127,7 +127,7 @@ class AuthController {
     // Logout
     public function logout() {
         session_destroy();
-        redirect('/login');
+        redirect('/public/login');
     }
 
     // Enviar código de recuperación
@@ -137,7 +137,7 @@ class AuthController {
 
             if (empty($correo) || !isValidEmail($correo)) {
                 $_SESSION['error'] = "El correo electrónico no es válido";
-                redirect('/recuperar-password');
+                redirect('/public/recuperar-password');
                 return;
             }
 
@@ -145,7 +145,7 @@ class AuthController {
             $this->userModel->correo = $correo;
             if (!$this->userModel->emailExists()) {
                 $_SESSION['error'] = "No existe una cuenta con este correo";
-                redirect('/recuperar-password');
+                redirect('/public/recuperar-password');
                 return;
             }
 
@@ -161,14 +161,14 @@ class AuthController {
                 if ($this->mailer->sendVerificationCode($correo, $code, $nombre)) {
                     $_SESSION['success'] = "Código enviado a tu correo";
                     $_SESSION['recovery_email'] = $correo;
-                    redirect('/recuperar-password?step=verify');
+                    redirect('/public/recuperar-password?step=verify');
                 } else {
                     $_SESSION['error'] = "Error al enviar el correo. Intenta de nuevo.";
-                    redirect('/recuperar-password');
+                    redirect('/public/recuperar-password');
                 }
             } else {
                 $_SESSION['error'] = "Error al generar el código. Intenta de nuevo.";
-                redirect('/recuperar-password');
+                redirect('/public/recuperar-password');
             }
         }
     }
@@ -184,19 +184,19 @@ class AuthController {
             // Validaciones
             if (empty($code) || empty($nueva_contrasena)) {
                 $_SESSION['error'] = "Todos los campos son requeridos";
-                redirect('/recuperar-password?step=verify');
+                redirect('/public/recuperar-password?step=verify');
                 return;
             }
 
             if (strlen($nueva_contrasena) < 8) {
                 $_SESSION['error'] = "La contraseña debe tener al menos 8 caracteres";
-                redirect('/recuperar-password?step=verify');
+                redirect('/public/recuperar-password?step=verify');
                 return;
             }
 
             if ($nueva_contrasena !== $confirmar_contrasena) {
                 $_SESSION['error'] = "Las contraseñas no coinciden";
-                redirect('/recuperar-password?step=verify');
+                redirect('/public/recuperar-password?step=verify');
                 return;
             }
 
@@ -208,14 +208,14 @@ class AuthController {
                 if ($this->userModel->updatePassword()) {
                     unset($_SESSION['recovery_email']);
                     $_SESSION['success'] = "Contraseña actualizada exitosamente. Inicia sesión.";
-                    redirect('/login');
+                    redirect('/public/login');
                 } else {
                     $_SESSION['error'] = "Error al actualizar la contraseña";
-                    redirect('/recuperar-password?step=verify');
+                    redirect('/public/recuperar-password?step=verify');
                 }
             } else {
                 $_SESSION['error'] = "Código inválido o expirado";
-                redirect('/recuperar-password?step=verify');
+                redirect('/public/recuperar-password?step=verify');
             }
         }
     }
@@ -242,7 +242,7 @@ if (isset($_GET['action'])) {
             $controller->verifyAndResetPassword();
             break;
         default:
-            redirect('/');
+            redirect('/public/');
             break;
     }
 }
