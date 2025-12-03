@@ -2,17 +2,35 @@
     RewriteEngine On
     RewriteBase /hersil_php/public/
     
-    # No reescribir archivos y directorios existentes
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     
-    # Reescribir todo lo demás a index.php
     RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>
 ```
 
----
+**IMPORTANTE:** 
+- NO copies el bloque de código completo desde mi mensaje
+- Copia línea por línea
+- O mejor aún, **escríbelo manualmente**
 
-**Por ahora, prueba acceder directamente con:**
+Debe quedar así (te lo escribo sin formato):
 ```
-http://localhost/hersil_php/public/views/auth/login.php
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /hersil_php/public/
+    
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+```
+
+**Guarda (Ctrl + S)**
+
+**Reinicia Apache** (Stop → Start)
+
+**Prueba:**
+```
+http://localhost/hersil_php/public/login
