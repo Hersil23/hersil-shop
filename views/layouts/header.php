@@ -66,11 +66,11 @@ $current_page = $_SERVER['REQUEST_URI'];
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-1">
-                    <a href="<?php echo BASE_URL; ?>/public/" class="flex items-center px-4 py-2 rounded-lg transition-colors <?php echo (strpos($current_page, '/inicio') !== false || $current_page === '/' || strpos($current_page, '/home') !== false) ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
+                    <a href="<?php echo BASE_URL; ?>/public/" class="px-4 py-2 rounded-lg transition-colors <?php echo (strpos($current_page, '/inicio') !== false || $current_page === '/' || strpos($current_page, '/home') !== false) ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
                         <i class="fas fa-home mr-2"></i>Inicio
                     </a>
                     
-                    <a href="<?php echo BASE_URL; ?>/productos" 
+                    <a href="<?php echo BASE_URL; ?>/public/productos" 
                        class="px-4 py-2 rounded-lg transition-colors <?php echo strpos($current_page, '/productos') !== false ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
                         <i class="fas fa-shopping-bag mr-2"></i>Productos
                     </a>
@@ -169,10 +169,10 @@ $current_page = $_SERVER['REQUEST_URI'];
 
                 <!-- Contenido del menú -->
                 <div class="p-4">
-                    <a href="<?php echo BASE_URL; ?>/" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                    <a href="<?php echo BASE_URL; ?>/public/" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                         <i class="fas fa-home mr-3 w-5"></i>Inicio
                     </a>
-                    <a href="<?php echo BASE_URL; ?>/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                    <a href="<?php echo BASE_URL; ?>/public/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                         <i class="fas fa-shopping-bag mr-3 w-5"></i>Productos
                     </a>
                     
