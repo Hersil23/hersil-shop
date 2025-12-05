@@ -151,10 +151,11 @@ class Category {
 
     // Obtener categorías activas (con productos)
     public function getActiveCategories() {
-        $query = "SELECT DISTINCT c.*
+        $query = "SELECT c.*, COUNT(p.id) as total_productos
                   FROM " . $this->table . " c
-                  INNER JOIN productos p ON c.id = p.id_categoria
-                  WHERE c.eliminado = 0 AND p.eliminado = 0
+                  LEFT JOIN productos p ON c.id = p.id_categoria AND p.eliminado = 0
+                  WHERE c.eliminado = 0
+                  GROUP BY c.id
                   ORDER BY c.nombre ASC";
 
         $stmt = $this->conn->prepare($query);
@@ -175,6 +176,24 @@ class Category {
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row['total'];
+    }
+
+    // Buscar categorías
+    public function search($searchTerm) {
+        $query = "SELECT c.*, COUNT(p.id) as total_productos 
+                  FROM " . $this->table . " c
+                  LEFT JOIN productos p ON c.id = p.id_categoria AND p.eliminado = 0
+                  WHERE c.eliminado = 0 
+                  AND (c.nombre LIKE :search OR c.descripcion LIKE :search)
+                  GROUP BY c.id
+                  ORDER BY c.nombre ASC";
+
+        $stmt = $this->conn->prepare($query);
+        $searchParam = "%{$searchTerm}%";
+        $stmt->bindParam(':search', $searchParam);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>
