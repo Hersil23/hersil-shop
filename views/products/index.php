@@ -145,9 +145,10 @@ $categories = $categoryModel->getActiveCategories();
                                         </span>
                                     </div>
                                     
-                                    <button class="w-full bg-blue-800 hover:bg-blue-900 text-white px-4 py-3 rounded-lg transition-colors font-semibold">
+                                    <a href="<?php echo BASE_URL; ?>/public/producto?id=<?php echo $product['id']; ?>" 
+                                        class="block w-full bg-blue-800 hover:bg-blue-900 text-white px-4 py-3 rounded-lg transition-colors font-semibold text-center">
                                         <i class="fas fa-eye mr-2"></i>Ver Detalles
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         <?php endforeach; ?>

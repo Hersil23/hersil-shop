@@ -19,6 +19,10 @@ if (!$product) {
     redirect('/public/productos');
     exit;
 }
+
+// Crear mensaje para WhatsApp
+$whatsapp_message = "Hola, estoy interesado en el producto: *" . $product['nombre'] . "* - Precio: $" . number_format($product['precio'], 2);
+$whatsapp_url = "https://wa.me/584145116337?text=" . urlencode($whatsapp_message);
 ?>
 
 <div class="bg-slate-50 dark:bg-slate-900/50 min-h-screen py-8">
@@ -122,12 +126,11 @@ if (!$product) {
                 <!-- Botones de acción -->
                 <div class="space-y-3">
                     <?php if ($product['stock'] > 0): ?>
-                        <button class="w-full bg-blue-800 hover:bg-blue-900 text-white px-6 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
-                            <i class="fas fa-shopping-cart mr-2"></i>Agregar al Carrito
-                        </button>
-                        <button class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-bold text-lg transition-all">
-                            <i class="fas fa-bolt mr-2"></i>Comprar Ahora
-                        </button>
+                        <a href="<?php echo $whatsapp_url; ?>" 
+                           target="_blank"
+                           class="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                            <i class="fab fa-whatsapp mr-2 text-2xl"></i>Comprar por WhatsApp
+                        </a>
                     <?php else: ?>
                         <button disabled class="w-full bg-slate-400 text-white px-6 py-4 rounded-lg font-bold text-lg cursor-not-allowed">
                             <i class="fas fa-times-circle mr-2"></i>Producto Agotado
