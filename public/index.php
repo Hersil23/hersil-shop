@@ -49,6 +49,10 @@ switch ($request) {
         require_once __DIR__ . '/../views/admin/products.php';
         break;
     
+    case '/producto':
+    require_once __DIR__ . '/../views/products/detail.php';
+    break;
+    
     // Rutas de administración
     case '/admin/usuarios':
         if (!isAdmin()) {

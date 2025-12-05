@@ -1,0 +1,147 @@
+<?php
+$page_title = "Detalle del Producto";
+require_once __DIR__ . '/../layouts/header.php';
+require_once __DIR__ . '/../../models/product.php';
+
+// Verificar que se recibió el ID
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    $_SESSION['error'] = "Producto no encontrado";
+    redirect('/public/productos');
+    exit;
+}
+
+$productModel = new Product();
+$product = $productModel->getById(intval($_GET['id']));
+
+// Verificar que el producto existe
+if (!$product) {
+    $_SESSION['error'] = "Producto no encontrado";
+    redirect('/public/productos');
+    exit;
+}
+?>
+
+<div class="bg-slate-50 dark:bg-slate-900/50 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        
+        <!-- Breadcrumb -->
+        <nav class="mb-8">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li><a href="<?php echo BASE_URL; ?>/public/" class="text-blue-600 dark:text-blue-400 hover:underline">Inicio</a></li>
+                <li><i class="fas fa-chevron-right text-slate-400 text-xs"></i></li>
+                <li><a href="<?php echo BASE_URL; ?>/public/productos" class="text-blue-600 dark:text-blue-400 hover:underline">Productos</a></li>
+                <li><i class="fas fa-chevron-right text-slate-400 text-xs"></i></li>
+                <li class="text-slate-600 dark:text-slate-400"><?php echo htmlspecialchars($product['nombre']); ?></li>
+            </ol>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Imagen del producto -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
+                <div class="aspect-square bg-slate-100 dark:bg-slate-700 rounded-xl overflow-hidden">
+                    <?php if (!empty($product['imagen_url'])): ?>
+                        <img src="<?php echo htmlspecialchars($product['imagen_url']); ?>" 
+                             alt="<?php echo htmlspecialchars($product['nombre']); ?>"
+                             class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                    <?php else: ?>
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-box text-9xl text-slate-400 dark:text-slate-500"></i>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Información del producto -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
+                
+                <!-- Categoría -->
+                <span class="inline-block px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm rounded-full mb-4">
+                    <i class="fas fa-tag mr-2"></i><?php echo htmlspecialchars($product['categoria_nombre'] ?? 'Sin categoría'); ?>
+                </span>
+
+                <!-- Nombre -->
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                    <?php echo htmlspecialchars($product['nombre']); ?>
+                </h1>
+
+                <!-- Precio y Stock -->
+                <div class="flex items-center gap-6 mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Precio</p>
+                        <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">
+                            $<?php echo number_format($product['precio'], 2); ?>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Disponibilidad</p>
+                        <p class="text-lg font-semibold <?php echo $product['stock'] > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'; ?>">
+                            <i class="fas fa-box mr-2"></i>
+                            <?php if ($product['stock'] > 10): ?>
+                                En stock (<?php echo $product['stock']; ?> unidades)
+                            <?php elseif ($product['stock'] > 0): ?>
+                                Últimas unidades (<?php echo $product['stock']; ?>)
+                            <?php else: ?>
+                                Agotado
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold mb-4">Descripción</h2>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                        <?php echo nl2br(htmlspecialchars($product['descripcion'])); ?>
+                    </p>
+                </div>
+
+                <!-- Características -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold mb-4">Información adicional</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                            <span>Garantía de calidad</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-shipping-fast text-blue-500 mr-3"></i>
+                            <span>Envío en 24-48 horas</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt text-purple-500 mr-3"></i>
+                            <span>Compra segura</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-undo text-orange-500 mr-3"></i>
+                            <span>30 días de devolución</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="space-y-3">
+                    <?php if ($product['stock'] > 0): ?>
+                        <button class="w-full bg-blue-800 hover:bg-blue-900 text-white px-6 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-shopping-cart mr-2"></i>Agregar al Carrito
+                        </button>
+                        <button class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-bold text-lg transition-all">
+                            <i class="fas fa-bolt mr-2"></i>Comprar Ahora
+                        </button>
+                    <?php else: ?>
+                        <button disabled class="w-full bg-slate-400 text-white px-6 py-4 rounded-lg font-bold text-lg cursor-not-allowed">
+                            <i class="fas fa-times-circle mr-2"></i>Producto Agotado
+                        </button>
+                    <?php endif; ?>
+                    
+                    <a href="<?php echo BASE_URL; ?>/public/productos" 
+                       class="block w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white px-6 py-4 rounded-lg font-bold text-lg text-center transition-all">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver a Productos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php require_once __DIR__ . '/../layouts/footer.php'; ?>
