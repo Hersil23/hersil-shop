@@ -1,335 +1,231 @@
 <?php
 /**
- * CategoryController
- * Maneja categorías: listar, CRUD (admin) con imágenes en Bunny CDN
+ * Modelo Category
+ * Maneja todas las operaciones relacionadas con categorías
  */
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../models/category.php';
-require_once __DIR__ . '/../utils/Security.php';
-require_once __DIR__ . '/../utils/BunnyStorage.php';
-require_once __DIR__ . '/../utils/ImageCompressor.php';
+require_once __DIR__ . '/../config/database.php';
 
-class CategoryController {
-    private $categoryModel;
-    private $bunnyStorage;
-    private $imageCompressor;
+class Category {
+    private $conn;
+    private $table = 'categorias';
+
+    // Propiedades de la categoría
+    public $id;
+    public $id_usuario;
+    public $nombre;
+    public $descripcion;
+    public $imagen_url;
+    public $activo;
+    public $eliminado;
 
     public function __construct() {
-        $this->categoryModel = new Category();
-        $this->bunnyStorage = new BunnyStorage();
-        $this->imageCompressor = new ImageCompressor(800, 800, 85);
+        $database = new Database();
+        $this->conn = $database->getConnection();
     }
 
-    // Listar todas las categorías
-    public function listCategories() {
-        return $this->categoryModel->getAll();
+    // Crear nueva categoría
+    public function create() {
+        $query = "INSERT INTO " . $this->table . " 
+                  SET id_usuario = :id_usuario,
+                      nombre = :nombre,
+                      descripcion = :descripcion,
+                      imagen_url = :imagen_url,
+                      activo = :activo";
+
+        $stmt = $this->conn->prepare($query);
+
+        // Sanitizar datos
+        $this->nombre = htmlspecialchars(strip_tags($this->nombre));
+        $this->descripcion = htmlspecialchars(strip_tags($this->descripcion ?? ''));
+        $this->activo = $this->activo ?? 1;
+
+        // Bind de parámetros
+        $stmt->bindParam(':id_usuario', $this->id_usuario);
+        $stmt->bindParam(':nombre', $this->nombre);
+        $stmt->bindParam(':descripcion', $this->descripcion);
+        $stmt->bindParam(':imagen_url', $this->imagen_url);
+        $stmt->bindParam(':activo', $this->activo);
+
+        if ($stmt->execute()) {
+            $this->id = $this->conn->lastInsertId();
+            return true;
+        }
+        return false;
     }
 
-    // Obtener categorías activas (con productos)
-    public function getActiveCategories() {
-        return $this->categoryModel->getActiveCategories();
+    // Obtener todas las categorías (no eliminadas)
+    public function getAll() {
+        $query = "SELECT c.*, u.nombre as usuario_nombre,
+                  (SELECT COUNT(*) FROM productos p WHERE p.id_categoria = c.id AND p.eliminado = 0) as total_productos
+                  FROM " . $this->table . " c
+                  LEFT JOIN usuarios u ON c.id_usuario = u.id
+                  WHERE c.eliminado = 0
+                  ORDER BY c.fecha_creacion DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Obtener categoría por ID
-    public function getCategoryById($id) {
-        return $this->categoryModel->getById($id);
+    public function getById($id) {
+        $query = "SELECT c.*, u.nombre as usuario_nombre,
+                  (SELECT COUNT(*) FROM productos p WHERE p.id_categoria = c.id AND p.eliminado = 0) as total_productos
+                  FROM " . $this->table . " c
+                  LEFT JOIN usuarios u ON c.id_usuario = u.id
+                  WHERE c.id = :id AND c.eliminado = 0
+                  LIMIT 1";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+        return null;
     }
 
-    // ============================================
-    // FUNCIONES AJAX (Admin)
-    // ============================================
-
-    /**
-     * Crear nueva categoría (AJAX)
-     */
-    public function create() {
-        if (!isAdmin()) {
-            return ['success' => false, 'message' => 'No autorizado'];
-        }
-
-        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            return ['success' => false, 'message' => 'Token de seguridad inválido'];
-        }
-
-        $nombre = Security::sanitize($_POST['nombre'] ?? '');
-        $descripcion = Security::sanitize($_POST['descripcion'] ?? '');
-
-        if (empty($nombre)) {
-            return ['success' => false, 'message' => 'El nombre es requerido'];
-        }
-
-        // Verificar nombre duplicado
-        $this->categoryModel->nombre = $nombre;
-        if ($this->categoryModel->nameExists()) {
-            return ['success' => false, 'message' => 'Ya existe una categoría con este nombre'];
-        }
-
-        // Procesar imagen si se subió
-        $imagen_url = null;
-        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-            $uploadResult = $this->uploadImage($_FILES['imagen']);
-            if (!$uploadResult['success']) {
-                return $uploadResult;
-            }
-            $imagen_url = $uploadResult['url'];
-        }
-
-        // Crear categoría
-        $this->categoryModel->id_usuario = $_SESSION['user_id'];
-        $this->categoryModel->nombre = $nombre;
-        $this->categoryModel->descripcion = $descripcion;
-        $this->categoryModel->imagen_url = $imagen_url;
-        $this->categoryModel->activo = 1;
-
-        if ($this->categoryModel->create()) {
-            Security::logAdminAction('create_category', ['id' => $this->categoryModel->id, 'nombre' => $nombre]);
-            return ['success' => true, 'message' => 'Categoría creada correctamente', 'id' => $this->categoryModel->id];
-        }
-
-        return ['success' => false, 'message' => 'Error al crear la categoría'];
-    }
-
-    /**
-     * Actualizar categoría (AJAX)
-     */
+    // Actualizar categoría
     public function update() {
-        if (!isAdmin()) {
-            return ['success' => false, 'message' => 'No autorizado'];
-        }
+        $query = "UPDATE " . $this->table . " 
+                  SET nombre = :nombre,
+                      descripcion = :descripcion,
+                      imagen_url = :imagen_url
+                  WHERE id = :id";
 
-        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            return ['success' => false, 'message' => 'Token de seguridad inválido'];
-        }
+        $stmt = $this->conn->prepare($query);
 
-        $id = intval($_POST['id'] ?? 0);
-        $nombre = Security::sanitize($_POST['nombre'] ?? '');
-        $descripcion = Security::sanitize($_POST['descripcion'] ?? '');
+        // Sanitizar datos
+        $this->nombre = htmlspecialchars(strip_tags($this->nombre));
+        $this->descripcion = htmlspecialchars(strip_tags($this->descripcion ?? ''));
 
-        if ($id <= 0 || empty($nombre)) {
-            return ['success' => false, 'message' => 'Datos inválidos'];
-        }
+        // Bind de parámetros
+        $stmt->bindParam(':nombre', $this->nombre);
+        $stmt->bindParam(':descripcion', $this->descripcion);
+        $stmt->bindParam(':imagen_url', $this->imagen_url);
+        $stmt->bindParam(':id', $this->id);
 
-        // Verificar que existe
-        $categoria = $this->categoryModel->getById($id);
-        if (!$categoria) {
-            return ['success' => false, 'message' => 'Categoría no encontrada'];
-        }
-
-        // Verificar nombre duplicado
-        $this->categoryModel->nombre = $nombre;
-        if ($this->categoryModel->nameExists($id)) {
-            return ['success' => false, 'message' => 'Ya existe otra categoría con este nombre'];
-        }
-
-        // Procesar nueva imagen si se subió
-        $imagen_url = $categoria['imagen_url'];
-        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-            // Eliminar imagen anterior
-            if (!empty($categoria['imagen_url'])) {
-                $this->bunnyStorage->delete($categoria['imagen_url']);
-            }
-            
-            $uploadResult = $this->uploadImage($_FILES['imagen']);
-            if (!$uploadResult['success']) {
-                return $uploadResult;
-            }
-            $imagen_url = $uploadResult['url'];
-        }
-
-        // Actualizar
-        $this->categoryModel->id = $id;
-        $this->categoryModel->nombre = $nombre;
-        $this->categoryModel->descripcion = $descripcion;
-        $this->categoryModel->imagen_url = $imagen_url;
-
-        if ($this->categoryModel->update()) {
-            Security::logAdminAction('update_category', ['id' => $id, 'nombre' => $nombre]);
-            return ['success' => true, 'message' => 'Categoría actualizada correctamente'];
-        }
-
-        return ['success' => false, 'message' => 'Error al actualizar la categoría'];
+        return $stmt->execute();
     }
 
-    /**
-     * Eliminar categoría (AJAX)
-     */
-    public function delete() {
-        if (!isAdmin()) {
-            return ['success' => false, 'message' => 'No autorizado'];
-        }
-
-        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            return ['success' => false, 'message' => 'Token de seguridad inválido'];
-        }
-
-        $id = intval($_POST['id'] ?? 0);
-
-        if ($id <= 0) {
-            return ['success' => false, 'message' => 'ID inválido'];
-        }
-
-        $categoria = $this->categoryModel->getById($id);
-        if (!$categoria) {
-            return ['success' => false, 'message' => 'Categoría no encontrada'];
-        }
-
-        $this->categoryModel->id = $id;
-
-        if ($this->categoryModel->delete($_SESSION['user_id'])) {
-            // Eliminar imagen de Bunny
-            if (!empty($categoria['imagen_url'])) {
-                $this->bunnyStorage->delete($categoria['imagen_url']);
-            }
-            Security::logAdminAction('delete_category', ['id' => $id, 'nombre' => $categoria['nombre']]);
-            return ['success' => true, 'message' => 'Categoría eliminada correctamente'];
-        }
-
-        return ['success' => false, 'message' => 'No se puede eliminar. Tiene productos asociados.'];
+    // Actualizar solo imagen
+    public function updateImage($id, $imagen_url) {
+        $query = "UPDATE " . $this->table . " SET imagen_url = :imagen_url WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':imagen_url', $imagen_url);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 
-    /**
-     * Cambiar estado activo/inactivo (AJAX)
-     */
-    public function toggle() {
-        if (!isAdmin()) {
-            return ['success' => false, 'message' => 'No autorizado'];
-        }
-
-        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            return ['success' => false, 'message' => 'Token de seguridad inválido'];
-        }
-
-        $id = intval($_POST['id'] ?? 0);
-
-        if ($id <= 0) {
-            return ['success' => false, 'message' => 'ID inválido'];
-        }
-
-        if ($this->categoryModel->toggleActive($id)) {
-            $categoria = $this->categoryModel->getById($id);
-            $estado = $categoria['activo'] ? 'activada' : 'desactivada';
-            return ['success' => true, 'message' => "Categoría {$estado}", 'activo' => $categoria['activo']];
-        }
-
-        return ['success' => false, 'message' => 'Error al cambiar el estado'];
+    // Cambiar estado activo/inactivo
+    public function toggleActive($id) {
+        $query = "UPDATE " . $this->table . " SET activo = NOT activo WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 
-    /**
-     * Obtener categoría por ID (AJAX)
-     */
-    public function get() {
-        if (!isAdmin()) {
-            return ['success' => false, 'message' => 'No autorizado'];
+    // Soft delete de categoría
+    public function delete($deleted_by) {
+        // Verificar si tiene productos asociados
+        $query_check = "SELECT COUNT(*) as total FROM productos 
+                        WHERE id_categoria = :id AND eliminado = 0";
+        
+        $stmt_check = $this->conn->prepare($query_check);
+        $stmt_check->bindParam(':id', $this->id);
+        $stmt_check->execute();
+        
+        $row = $stmt_check->fetch(PDO::FETCH_ASSOC);
+        
+        if ($row['total'] > 0) {
+            return false; // No se puede eliminar si tiene productos
         }
 
-        $id = intval($_GET['id'] ?? 0);
+        // Si no tiene productos, proceder con el soft delete
+        $query = "UPDATE " . $this->table . " 
+                  SET eliminado = 1,
+                      fecha_eliminacion = NOW(),
+                      eliminado_por = :eliminado_por
+                  WHERE id = :id";
 
-        if ($id <= 0) {
-            return ['success' => false, 'message' => 'ID inválido'];
-        }
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':eliminado_por', $deleted_by);
+        $stmt->bindParam(':id', $this->id);
 
-        $categoria = $this->categoryModel->getById($id);
-
-        if ($categoria) {
-            return ['success' => true, 'data' => $categoria];
-        }
-
-        return ['success' => false, 'message' => 'Categoría no encontrada'];
+        return $stmt->execute();
     }
 
-    /**
-     * Eliminar solo la imagen (AJAX)
-     */
-    public function deleteImage() {
-        if (!isAdmin()) {
-            return ['success' => false, 'message' => 'No autorizado'];
+    // Verificar si el nombre de categoría ya existe
+    public function nameExists($excludeId = null) {
+        $query = "SELECT id FROM " . $this->table . " 
+                  WHERE nombre = :nombre AND eliminado = 0";
+        
+        if ($excludeId) {
+            $query .= " AND id != :id";
         }
+        
+        $query .= " LIMIT 1";
 
-        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
-            return ['success' => false, 'message' => 'Token de seguridad inválido'];
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':nombre', $this->nombre);
+        
+        if ($excludeId) {
+            $stmt->bindParam(':id', $excludeId);
         }
+        
+        $stmt->execute();
 
-        $id = intval($_POST['id'] ?? 0);
-
-        $categoria = $this->categoryModel->getById($id);
-        if (!$categoria) {
-            return ['success' => false, 'message' => 'Categoría no encontrada'];
-        }
-
-        if (!empty($categoria['imagen_url'])) {
-            $this->bunnyStorage->delete($categoria['imagen_url']);
-        }
-
-        if ($this->categoryModel->updateImage($id, null)) {
-            return ['success' => true, 'message' => 'Imagen eliminada'];
-        }
-
-        return ['success' => false, 'message' => 'Error al eliminar la imagen'];
+        return $stmt->rowCount() > 0;
     }
 
-    /**
-     * Subir y comprimir imagen
-     */
-    private function uploadImage($file) {
-        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        $validation = Security::validateUpload($file, $allowedTypes, 5 * 1024 * 1024);
+    // Obtener categorías activas (para select en formularios)
+    public function getActiveCategories() {
+        $query = "SELECT c.*, COUNT(p.id) as total_productos
+                  FROM " . $this->table . " c
+                  LEFT JOIN productos p ON c.id = p.id_categoria AND p.eliminado = 0
+                  WHERE c.eliminado = 0 AND c.activo = 1
+                  GROUP BY c.id
+                  ORDER BY c.nombre ASC";
 
-        if (!$validation['valid']) {
-            return ['success' => false, 'message' => implode(', ', $validation['errors'])];
-        }
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
 
-        // Comprimir
-        $compressed = $this->imageCompressor->compressFromUpload($file);
-        if (!$compressed['success']) {
-            return ['success' => false, 'message' => $compressed['message']];
-        }
-
-        // Subir a Bunny
-        $fileName = 'cat_' . uniqid() . '_' . time() . '.jpg';
-        $uploadResult = $this->bunnyStorage->upload($compressed['path'], 'categories/' . $fileName);
-
-        // Limpiar temporal
-        $this->imageCompressor->cleanup($compressed['path']);
-
-        if ($uploadResult['success']) {
-            return ['success' => true, 'url' => $uploadResult['url']];
-        }
-
-        return ['success' => false, 'message' => 'Error al subir la imagen al CDN'];
-    }
-}
-
-// Procesar peticiones AJAX
-if (isset($_REQUEST['action'])) {
-    $controller = new CategoryController();
-    $action = $_REQUEST['action'];
-
-    $response = ['success' => false, 'message' => 'Acción no válida'];
-
-    switch ($action) {
-        case 'create':
-            $response = $controller->create();
-            break;
-        case 'update':
-            $response = $controller->update();
-            break;
-        case 'delete':
-            $response = $controller->delete();
-            break;
-        case 'toggle':
-            $response = $controller->toggle();
-            break;
-        case 'get':
-            $response = $controller->get();
-            break;
-        case 'delete_image':
-            $response = $controller->deleteImage();
-            break;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit;
+    // Contar productos por categoría
+    public function getProductCount($categoria_id) {
+        $query = "SELECT COUNT(*) as total 
+                  FROM productos 
+                  WHERE id_categoria = :categoria_id AND eliminado = 0";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':categoria_id', $categoria_id);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row['total'];
+    }
+
+    // Buscar categorías
+    public function search($searchTerm) {
+        $query = "SELECT c.*, COUNT(p.id) as total_productos 
+                  FROM " . $this->table . " c
+                  LEFT JOIN productos p ON c.id = p.id_categoria AND p.eliminado = 0
+                  WHERE c.eliminado = 0 
+                  AND (c.nombre LIKE :search OR c.descripcion LIKE :search)
+                  GROUP BY c.id
+                  ORDER BY c.nombre ASC";
+
+        $stmt = $this->conn->prepare($query);
+        $searchParam = "%{$searchTerm}%";
+        $stmt->bindParam(':search', $searchParam);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>
