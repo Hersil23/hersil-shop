@@ -1,4 +1,25 @@
 <?php
+<?php
+echo "DEBUG: Inicio del archivo<br>";
+
+$page_title = "Gestión de Categorías";
+require_once __DIR__ . '/../layouts/header.php';
+
+echo "DEBUG: Header cargado<br>";
+
+if (!isLoggedIn() || !isAdmin()) {
+    $_SESSION['error'] = "No tienes permiso para acceder a esta página";
+    redirect('/public/');
+    exit;
+}
+
+echo "DEBUG: Pasó verificación admin<br>";
+
+require_once __DIR__ . '/../../models/category.php';
+echo "DEBUG: Modelo cargado<br>";
+
+$categoryModel = new Category();
+echo "DEBUG: Instancia creada<br>";
 $page_title = "Gestión de Categorías";
 require_once __DIR__ . '/../layouts/header.php';
 
