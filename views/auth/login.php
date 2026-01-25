@@ -19,10 +19,10 @@ if (isLoggedIn()) {
                     Debes cerrar sesión antes de iniciar con otra cuenta.
                 </p>
                 <div class="space-y-3">
-                    <a href="<?php echo BASE_URL; ?>/public/" class="block w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-lg transition-all">
+                    <a href="<?php echo BASE_URL; ?>/" class="block w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-lg transition-all">
                         <i class="fas fa-home mr-2"></i>Ir al inicio
                     </a>
-                    <a href="<?php echo BASE_URL; ?>/controllers/authcontroller.php?action=logout" class="block w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white font-semibold py-3 px-4 rounded-lg transition-all">
+                    <a href="<?php echo BASE_URL; ?>/logout" class="block w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white font-semibold py-3 px-4 rounded-lg transition-all">
                         <i class="fas fa-sign-out-alt mr-2"></i>Cerrar sesión
                     </a>
                 </div>
@@ -31,6 +31,14 @@ if (isLoggedIn()) {
     </div>
     <?php
     require_once __DIR__ . '/../layouts/footer.php';
+    exit();
+}
+
+// Procesar el formulario si es POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/../../controllers/authcontroller.php';
+    $authController = new AuthController();
+    $authController->login();
     exit();
 }
 
@@ -57,7 +65,7 @@ require_once __DIR__ . '/../layouts/header.php';
         <!-- Formulario de Login -->
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 space-y-6 border border-slate-200 dark:border-slate-700">
             
-            <form action="<?php echo BASE_URL; ?>/controllers/authcontroller.php?action=login" method="POST" class="space-y-6">
+            <form action="<?php echo BASE_URL; ?>/login" method="POST" class="space-y-6">
                 
                 <!-- Email -->
                 <div>
@@ -96,7 +104,7 @@ require_once __DIR__ . '/../layouts/header.php';
                         <input type="checkbox" class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 dark:bg-slate-700 dark:border-slate-600">
                         <span class="ml-2 text-slate-600 dark:text-slate-400">Recordarme</span>
                     </label>
-                    <a href="<?php echo BASE_URL; ?>/public/recuperar-password" class="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
+                    <a href="<?php echo BASE_URL; ?>/recuperar-password" class="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
                         ¿Olvidaste tu contraseña?
                     </a>
                 </div>
@@ -125,7 +133,7 @@ require_once __DIR__ . '/../layouts/header.php';
 
             <!-- Botón Registro -->
             <a 
-                href="<?php echo BASE_URL; ?>/public/register"
+                href="<?php echo BASE_URL; ?>/register"
                 class="w-full block text-center bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-900 dark:text-white font-semibold py-3 px-4 rounded-lg transition-all border-2 border-slate-300 dark:border-slate-600"
             >
                 <i class="fas fa-user-plus mr-2"></i>Crear cuenta nueva
@@ -134,7 +142,7 @@ require_once __DIR__ . '/../layouts/header.php';
 
         <!-- Link volver al inicio -->
         <div class="text-center">
-            <a href="<?php echo BASE_URL; ?>/public/" class="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <a href="<?php echo BASE_URL; ?>/" class="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>Volver al inicio
             </a>
         </div>

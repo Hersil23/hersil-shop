@@ -26,12 +26,12 @@ $categories = $categoryModel->getActiveCategories();
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
-                    <a href="<?php echo BASE_URL; ?>/public/productos" 
+                    <a href="<?php echo BASE_URL; ?>/productos" 
                        class="w-full sm:w-auto bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg text-center">
                         <i class="fas fa-shopping-bag mr-2"></i>Ver Productos
                     </a>
                     <?php if (!isLoggedIn()): ?>
-                    <a href="<?php echo BASE_URL; ?>/public/register" 
+                    <a href="<?php echo BASE_URL; ?>/register" 
                        class="w-full sm:w-auto bg-blue-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-600 transition-all border-2 border-white text-center">
                         <i class="fas fa-user-plus mr-2"></i>Registrarse
                     </a>
@@ -104,7 +104,7 @@ $categories = $categoryModel->getActiveCategories();
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
             <?php foreach ($categories as $category): ?>
-                <a href="<?php echo BASE_URL; ?>/public/productos?categoria=<?php echo $category['id']; ?>" 
+                <a href="<?php echo BASE_URL; ?>/productos?categoria=<?php echo $category['id']; ?>" 
                    class="group bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
                     <div class="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4 group-hover:scale-110 transition-transform">
                         <i class="fas fa-folder text-xl md:text-2xl text-white"></i>
@@ -168,7 +168,7 @@ $categories = $categoryModel->getActiveCategories();
                             </span>
                         </div>
                         
-                        <a href="<?php echo BASE_URL; ?>/public/producto?id=<?php echo $product['id']; ?>" 
+                        <a href="<?php echo BASE_URL; ?>/producto?id=<?php echo $product['id']; ?>" 
                            class="block w-full bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 md:py-3 rounded-lg transition-colors font-semibold text-sm md:text-base text-center">
                             <i class="fas fa-eye mr-2"></i>Ver Detalles
                         </a>
@@ -178,7 +178,7 @@ $categories = $categoryModel->getActiveCategories();
         </div>
 
         <div class="text-center mt-8 md:mt-12">
-            <a href="<?php echo BASE_URL; ?>/public/productos" 
+            <a href="<?php echo BASE_URL; ?>/productos" 
                class="inline-block bg-blue-800 hover:bg-blue-900 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
                 Ver Todos los Productos
                 <i class="fas fa-arrow-right ml-2"></i>
@@ -195,7 +195,7 @@ $categories = $categoryModel->getActiveCategories();
             <p class="text-base md:text-lg text-blue-100 mb-6 md:mb-8 max-w-2xl mx-auto">
                 Regístrate ahora y obtén acceso a ofertas exclusivas y los mejores productos del mercado
             </p>
-            <a href="<?php echo BASE_URL; ?>/public/register" 
+            <a href="<?php echo BASE_URL; ?>/register" 
                class="inline-block bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg text-sm md:text-base">
                 <i class="fas fa-rocket mr-2"></i>Comenzar Ahora
             </a>
@@ -203,4 +203,5 @@ $categories = $categoryModel->getActiveCategories();
     </div>
 </section>
 
+<?php require_once __DIR__ . '/layouts/footer.php'; ?>
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>

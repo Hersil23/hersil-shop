@@ -38,7 +38,7 @@ $categories = $categoryModel->getActiveCategories();
                         <i class="fas fa-search mr-2 text-blue-600 dark:text-blue-400"></i>
                         Buscar
                     </h3>
-                    <form method="GET" action="<?php echo BASE_URL; ?>/public/productos" class="space-y-3">
+                    <form method="GET" action="<?php echo BASE_URL; ?>/productos" class="space-y-3">
                         <input 
                             type="text" 
                             name="busqueda" 
@@ -50,7 +50,7 @@ $categories = $categoryModel->getActiveCategories();
                             <i class="fas fa-search mr-2"></i>Buscar
                         </button>
                         <?php if ($busqueda): ?>
-                            <a href="<?php echo BASE_URL; ?>/public/productos" class="block text-center text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">
+                            <a href="<?php echo BASE_URL; ?>/productos" class="block text-center text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600">
                                 Limpiar búsqueda
                             </a>
                         <?php endif; ?>
@@ -63,12 +63,12 @@ $categories = $categoryModel->getActiveCategories();
                         Categorías
                     </h3>
                     <div class="space-y-2">
-                        <a href="<?php echo BASE_URL; ?>/public/productos" 
+                        <a href="<?php echo BASE_URL; ?>/productos" 
                            class="block px-4 py-2 rounded-lg transition-colors <?php echo !$categoria_id ? 'bg-blue-800 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'; ?>">
                             <i class="fas fa-th mr-2"></i>Todas
                         </a>
                         <?php foreach ($categories as $category): ?>
-                            <a href="<?php echo BASE_URL; ?>/public/productos?categoria=<?php echo $category['id']; ?>" 
+                            <a href="<?php echo BASE_URL; ?>/productos?categoria=<?php echo $category['id']; ?>" 
                                class="block px-4 py-2 rounded-lg transition-colors <?php echo $categoria_id == $category['id'] ? 'bg-blue-800 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-700'; ?>">
                                 <i class="fas fa-folder mr-2"></i><?php echo htmlspecialchars($category['nombre']); ?>
                                 <span class="text-xs opacity-75">(<?php echo $category['total_productos'] ?? 0; ?>)</span>
@@ -101,7 +101,7 @@ $categories = $categoryModel->getActiveCategories();
                                 No hay productos en esta categoría
                             <?php endif; ?>
                         </p>
-                        <a href="<?php echo BASE_URL; ?>/public/productos" class="inline-block bg-blue-800 hover:bg-blue-900 text-white px-6 py-2 rounded-lg transition-colors">
+                        <a href="<?php echo BASE_URL; ?>/productos" class="inline-block bg-blue-800 hover:bg-blue-900 text-white px-6 py-2 rounded-lg transition-colors">
                             Ver todos los productos
                         </a>
                     </div>
@@ -145,7 +145,7 @@ $categories = $categoryModel->getActiveCategories();
                                         </span>
                                     </div>
                                     
-                                    <a href="<?php echo BASE_URL; ?>/public/producto?id=<?php echo $product['id']; ?>" 
+                                    <a href="<?php echo BASE_URL; ?>/producto?id=<?php echo $product['id']; ?>" 
                                         class="block w-full bg-blue-800 hover:bg-blue-900 text-white px-4 py-3 rounded-lg transition-colors font-semibold text-center">
                                         <i class="fas fa-eye mr-2"></i>Ver Detalles
                                     </a>

@@ -26,7 +26,8 @@ if (!isset($_ENV['APP_URL'])) {
 }
 
 // Definir constantes
-define('BASE_URL', $_ENV['APP_URL'] ?? 'http://localhost/hersil_php');
+// En producción, APP_URL debe ser https://tienda.twistpro.net
+define('BASE_URL', $_ENV['APP_URL'] ?? 'https://tienda.twistpro.net');
 define('APP_NAME', $_ENV['APP_NAME'] ?? 'Hersil Shop');
 
 // Función para redirigir

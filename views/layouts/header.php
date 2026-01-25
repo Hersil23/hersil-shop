@@ -57,7 +57,7 @@ $current_page = $_SERVER['REQUEST_URI'];
             <div class="flex items-center justify-between h-20 md:h-24">
                 
                 <!-- Logo -->
-                <a href="<?php echo BASE_URL; ?>/public/" class="flex items-center space-x-3">
+                <a href="<?php echo BASE_URL; ?>/" class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-800 to-blue-600 rounded-lg flex items-center justify-center">
                         <i class="fas fa-bolt text-white text-xl"></i>
                     </div>
@@ -66,11 +66,11 @@ $current_page = $_SERVER['REQUEST_URI'];
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-1">
-                    <a href="<?php echo BASE_URL; ?>/public/" class="px-4 py-2 rounded-lg transition-colors <?php echo (strpos($current_page, '/inicio') !== false || $current_page === '/' || strpos($current_page, '/home') !== false) ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
+                    <a href="<?php echo BASE_URL; ?>/" class="px-4 py-2 rounded-lg transition-colors <?php echo (strpos($current_page, '/inicio') !== false || $current_page === '/' || strpos($current_page, '/home') !== false) ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
                         <i class="fas fa-home mr-2"></i>Inicio
                     </a>
                     
-                    <a href="<?php echo BASE_URL; ?>/public/productos" 
+                    <a href="<?php echo BASE_URL; ?>/productos" 
                        class="px-4 py-2 rounded-lg transition-colors <?php echo strpos($current_page, '/productos') !== false ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
                         <i class="fas fa-shopping-bag mr-2"></i>Productos
                     </a>
@@ -84,13 +84,13 @@ $current_page = $_SERVER['REQUEST_URI'];
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
                                 <div class="absolute left-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                    <a href="<?php echo BASE_URL; ?>/public/admin/usuarios" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                    <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                                         <i class="fas fa-users mr-2"></i>Usuarios
                                     </a>
-                                    <a href="<?php echo BASE_URL; ?>/public/admin/categorias" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                    <a href="<?php echo BASE_URL; ?>/admin/categorias" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                                         <i class="fas fa-tags mr-2"></i>Categorías
                                     </a>
-                                    <a href="<?php echo BASE_URL; ?>/public/admin/productos" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                    <a href="<?php echo BASE_URL; ?>/admin/productos" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                                         <i class="fas fa-box mr-2"></i>Productos
                                     </a>
                                 </div>
@@ -108,21 +108,21 @@ $current_page = $_SERVER['REQUEST_URI'];
                                     <p class="font-semibold"><?php echo $currentUser['nombre'] . ' ' . $currentUser['apellido']; ?></p>
                                     <p class="text-sm text-slate-500 dark:text-slate-400"><?php echo $currentUser['correo']; ?></p>
                                 </div>
-                                <a href="<?php echo BASE_URL; ?>/public/perfil" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <a href="<?php echo BASE_URL; ?>/perfil" class="block px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                                     <i class="fas fa-user mr-2"></i>Mi Perfil
                                 </a>
-                                <a href="<?php echo BASE_URL; ?>/controllers/authcontroller.php?action=logout" class="block px-4 py-3 text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <a href="<?php echo BASE_URL; ?>/logout" class="block px-4 py-3 text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                                     <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
                                 </a>
                             </div>
                         </div>
                     <?php else: ?>
                         <!-- Botones Login/Registro -->
-                        <a href="<?php echo BASE_URL; ?>/public/login"
+                        <a href="<?php echo BASE_URL; ?>/login"
                             class="px-4 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
                             <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
                         </a>
-                        <a href="<?php echo BASE_URL; ?>/public/register" 
+                        <a href="<?php echo BASE_URL; ?>/register" 
                             class="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white rounded-lg transition-colors">
                             <i class="fas fa-user-plus mr-2"></i>Registrarse
                         </a>
@@ -169,10 +169,10 @@ $current_page = $_SERVER['REQUEST_URI'];
 
                 <!-- Contenido del menú -->
                 <div class="p-4">
-                    <a href="<?php echo BASE_URL; ?>/public/" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                    <a href="<?php echo BASE_URL; ?>/" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                         <i class="fas fa-home mr-3 w-5"></i>Inicio
                     </a>
-                    <a href="<?php echo BASE_URL; ?>/public/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                    <a href="<?php echo BASE_URL; ?>/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                         <i class="fas fa-shopping-bag mr-3 w-5"></i>Productos
                     </a>
                     
@@ -180,13 +180,13 @@ $current_page = $_SERVER['REQUEST_URI'];
                         <?php if ($isAdmin): ?>
                             <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
                                 <p class="px-4 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400">Administración</p>
-                                <a href="<?php echo BASE_URL; ?>/public/admin/usuarios" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                <a href="<?php echo BASE_URL; ?>/admin/usuarios" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                                     <i class="fas fa-users mr-3 w-5"></i>Usuarios
                                 </a>
-                                <a href="<?php echo BASE_URL; ?>/public/admin/categorias" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                <a href="<?php echo BASE_URL; ?>/admin/categorias" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                                     <i class="fas fa-tags mr-3 w-5"></i>Categorías
                                 </a>
-                                <a href="<?php echo BASE_URL; ?>/public/admin/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                                <a href="<?php echo BASE_URL; ?>/admin/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                                     <i class="fas fa-box mr-3 w-5"></i>Productos
                                 </a>
                             </div>
@@ -197,19 +197,19 @@ $current_page = $_SERVER['REQUEST_URI'];
                                 <p class="font-semibold"><?php echo $currentUser['nombre'] . ' ' . $currentUser['apellido']; ?></p>
                                 <p class="text-sm text-slate-500 dark:text-slate-400"><?php echo $currentUser['correo']; ?></p>
                             </div>
-                            <a href="<?php echo BASE_URL; ?>/public/perfil" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                            <a href="<?php echo BASE_URL; ?>/perfil" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                                 <i class="fas fa-user mr-3 w-5"></i>Mi Perfil
                             </a>
-                            <a href="<?php echo BASE_URL; ?>/controllers/authcontroller.php?action=logout" class="flex items-center px-4 py-3 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                            <a href="<?php echo BASE_URL; ?>/logout" class="flex items-center px-4 py-3 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                                 <i class="fas fa-sign-out-alt mr-3 w-5"></i>Cerrar Sesión
                             </a>
                         </div>
                     <?php else: ?>
                         <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
-                            <a href="<?php echo BASE_URL; ?>/public/login" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                            <a href="<?php echo BASE_URL; ?>/login" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
                                 <i class="fas fa-sign-in-alt mr-3 w-5"></i>Iniciar Sesión
                             </a>
-                            <a href="<?php echo BASE_URL; ?>/public/register" class="flex items-center px-4 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors">
+                            <a href="<?php echo BASE_URL; ?>/register" class="flex items-center px-4 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors">
                                 <i class="fas fa-user-plus mr-3 w-5"></i>Registrarse
                             </a>
                         </div>
