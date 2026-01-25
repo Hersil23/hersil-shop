@@ -34,12 +34,6 @@ if (!isset($_ENV['APP_URL'])) {
 define('BASE_URL', $_ENV['APP_URL'] ?? 'https://twistpro.net');
 define('APP_NAME', $_ENV['APP_NAME'] ?? 'Hersil Shop');
 
-// Función para redirigir
-function redirect($url) {
-    header("Location: " . BASE_URL . $url);
-    exit();
-}
-
 // Función para verificar si el usuario está logueado
 function isLoggedIn() {
     return isset($_SESSION['user_id']) && Security::validateSession();
