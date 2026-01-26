@@ -1,10 +1,10 @@
 <?php
 class Database {
     private $host = 'localhost';
-    private $port = '3306';
-    private $db_name = 'twistpro_hersil-php';
-    private $username = 'twistpro_hersil';
-    private $password = 'Todomarket02.';
+    private $port = '3307';
+    private $db_name = 'hersil_php';
+    private $username = 'root';
+    private $password = '';
     public $conn;
 
     private function loadEnv() {
@@ -13,9 +13,6 @@ class Database {
             $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($lines as $line) {
                 if (strpos(trim($line), '#') === 0) {
-                    continue;
-                }
-                if (strpos($line, '=') === false) {
                     continue;
                 }
                 list($key, $value) = explode('=', $line, 2);
@@ -33,11 +30,11 @@ class Database {
 
         $this->loadEnv();
 
-        $this->host = $_ENV['DB_HOST'] ?? $this->host;
-        $this->port = $_ENV['DB_PORT'] ?? $this->port;
-        $this->db_name = $_ENV['DB_NAME'] ?? $this->db_name;
-        $this->username = $_ENV['DB_USER'] ?? $this->username;
-        $this->password = $_ENV['DB_PASSWORD'] ?? $this->password;
+        $this->host = $_ENV['DB_HOST'] ?? 'localhost';
+        $this->port = $_ENV['DB_PORT'] ?? '3307';
+        $this->db_name = $_ENV['DB_NAME'] ?? 'hersil_php';
+        $this->username = $_ENV['DB_USER'] ?? 'root';
+        $this->password = $_ENV['DB_PASSWORD'] ?? '';
 
         try {
             $this->conn = new PDO(
