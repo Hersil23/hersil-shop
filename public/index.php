@@ -95,8 +95,6 @@ case '/api/categories':
         break;
         
     default:
-        http_response_code(404);        
-    default:
         http_response_code(404);
         echo '<h1>404 - Pagina no encontrada</h1>';
         echo '<p><a href="' . BASE_URL . '/">Volver al inicio</a></p>';
