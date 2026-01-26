@@ -1,10 +1,20 @@
 RewriteEngine On
 
-# Redirigir todo a la carpeta public
-RewriteCond %{REQUEST_URI} !^/public/
+# Forzar HTTPS (opcional pero recomendado)
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Si el archivo o directorio existe, servirlo directamente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Si ya está en /public, dejarlo pasar al index.php de public
+RewriteCond %{REQUEST_URI} ^/public/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /public/$1 [L]
+RewriteRule ^public/(.*)$ /public/index.php [L,QSA]
 
-# Si acceden a la raíz, ir a public/index.php
-RewriteRule ^$ /public/index.php [L]
+# Redirigir todo lo demás a /public/index.php (sin /public en la URL)
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/index.php [L,QSA]
