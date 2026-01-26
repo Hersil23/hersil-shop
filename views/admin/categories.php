@@ -1,25 +1,4 @@
 <?php
-<?php
-echo "DEBUG: Inicio del archivo<br>";
-
-$page_title = "Gestión de Categorías";
-require_once __DIR__ . '/../layouts/header.php';
-
-echo "DEBUG: Header cargado<br>";
-
-if (!isLoggedIn() || !isAdmin()) {
-    $_SESSION['error'] = "No tienes permiso para acceder a esta página";
-    redirect('/public/');
-    exit;
-}
-
-echo "DEBUG: Pasó verificación admin<br>";
-
-require_once __DIR__ . '/../../models/category.php';
-echo "DEBUG: Modelo cargado<br>";
-
-$categoryModel = new Category();
-echo "DEBUG: Instancia creada<br>";
 $page_title = "Gestión de Categorías";
 require_once __DIR__ . '/../layouts/header.php';
 
@@ -249,7 +228,6 @@ const CONTROLLER_URL = '<?php echo BASE_URL; ?>/controllers/CategoryController.p
 let isEditing = false;
 let currentImageUrl = null;
 
-// Abrir modal para crear
 function openCreateModal() {
     isEditing = false;
     document.getElementById('modalTitle').textContent = 'Nueva Categoría';
@@ -260,7 +238,6 @@ function openCreateModal() {
     openModal();
 }
 
-// Abrir modal para editar
 async function openEditModal(id) {
     isEditing = true;
     document.getElementById('modalTitle').textContent = 'Editar Categoría';
@@ -302,7 +279,6 @@ function closeModal() {
     document.getElementById('categoryModal').classList.remove('flex');
 }
 
-// Preview de imagen
 document.getElementById('categoryImagen').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -321,7 +297,6 @@ function removeImage() {
     currentImageUrl = null;
 }
 
-// Enviar formulario
 document.getElementById('categoryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -360,7 +335,6 @@ document.getElementById('categoryForm').addEventListener('submit', async functio
     }
 });
 
-// Toggle activo/inactivo
 async function toggleCategory(id) {
     try {
         const formData = new FormData();
@@ -386,7 +360,6 @@ async function toggleCategory(id) {
     }
 }
 
-// Eliminar categoría
 async function deleteCategory(id, nombre) {
     if (!confirm(`¿Eliminar la categoría "${nombre}"?\n\nSolo se puede eliminar si no tiene productos.`)) {
         return;
@@ -416,7 +389,6 @@ async function deleteCategory(id, nombre) {
     }
 }
 
-// Notificaciones
 function showNotification(message, type = 'info') {
     const colors = {
         success: 'bg-green-500',
@@ -435,7 +407,6 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Cerrar modal con Escape
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeModal();
 });
