@@ -4,12 +4,13 @@ require_once __DIR__ . '/../layouts/header.php';
 
 if (!isLoggedIn() || !isAdmin()) {
     $_SESSION['error'] = "No tienes permiso para acceder a esta página";
-    redirect('/public/');
+    redirect('/');
     exit;
 }
 
 require_once __DIR__ . '/../../models/product.php';
 require_once __DIR__ . '/../../models/category.php';
+require_once __DIR__ . '/../../utils/Security.php';
 
 $productModel = new Product();
 $categoryModel = new Category();
@@ -26,6 +27,7 @@ if ($busqueda) {
 }
 
 $categories = $categoryModel->getAll();
+$csrf_token = Security::generateCSRFToken();
 ?>
 
 <div class="bg-slate-50 dark:bg-slate-900/50 min-h-screen py-8">
@@ -66,13 +68,13 @@ $categories = $categoryModel->getAll();
                         <?php endforeach; ?>
                     </select>
 
-                    <button onclick="addProduct()" 
+                    <button onclick="openModal()" 
                             class="px-6 py-3 bg-blue-800 hover:bg-blue-900 text-white rounded-lg transition-colors font-semibold whitespace-nowrap">
                         <i class="fas fa-plus mr-2"></i>Nuevo Producto
                     </button>
                     
                     <?php if ($busqueda || $filtro_categoria): ?>
-                    <a href="<?php echo BASE_URL; ?>/public/admin/productos" 
+                    <a href="<?php echo BASE_URL; ?>/admin/productos" 
                        class="px-4 py-3 bg-slate-200 dark:bg-slate-700 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                         <i class="fas fa-times"></i>
                     </a>
@@ -144,17 +146,12 @@ $categories = $categoryModel->getAll();
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button onclick="viewProduct(<?php echo $product['id']; ?>)" 
-                                                class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors" 
-                                                title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
                                         <button onclick="editProduct(<?php echo $product['id']; ?>)" 
                                                 class="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors" 
                                                 title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button onclick="deleteProduct(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['nombre']); ?>')" 
+                                        <button onclick="deleteProduct(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars(addslashes($product['nombre'])); ?>')" 
                                                 class="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors" 
                                                 title="Eliminar">
                                             <i class="fas fa-trash"></i>
@@ -177,24 +174,234 @@ $categories = $categoryModel->getAll();
     </div>
 </div>
 
+<!-- Modal Producto -->
+<div id="productModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <h2 id="modalTitle" class="text-2xl font-bold">Nuevo Producto</h2>
+            <button onclick="closeModal()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form id="productForm" class="p-6 space-y-6" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+            <input type="hidden" name="id" id="productId">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-2">Nombre del producto *</label>
+                    <input type="text" name="nombre" id="productNombre" required
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Categoría *</label>
+                    <select name="id_categoria" id="productCategoria" required
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Seleccionar categoría</option>
+                        <?php foreach ($categories as $cat): ?>
+                            <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['nombre']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Precio *</label>
+                    <input type="number" name="precio" id="productPrecio" step="0.01" min="0.01" required
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Stock *</label>
+                    <input type="number" name="stock" id="productStock" min="0" required
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-2">Descripción</label>
+                    <textarea name="descripcion" id="productDescripcion" rows="3"
+                              class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-2">Imagen</label>
+                    <div id="imagePreviewContainer" class="hidden mb-4">
+                        <div class="relative inline-block">
+                            <img id="imagePreview" src="" alt="Preview" class="w-32 h-32 object-cover rounded-lg border border-slate-300 dark:border-slate-600">
+                            <button type="button" onclick="removeImage()" 
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" name="imagen" id="productImagen" accept="image/*"
+                           onchange="previewImage(this)"
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 dark:file:bg-blue-900/30 dark:file:text-blue-400">
+                    <p class="text-xs text-slate-500 mt-1">Formatos: JPG, PNG, GIF, WebP. Máximo 5MB.</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button type="button" onclick="closeModal()" 
+                        class="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-semibold">
+                    Cancelar
+                </button>
+                <button type="submit" id="submitBtn"
+                        class="flex-1 px-6 py-3 bg-blue-800 hover:bg-blue-900 text-white rounded-lg transition-colors font-semibold">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-function addProduct() {
-    alert('Agregar nuevo producto\n(Funcionalidad pendiente)');
-}
+const API_URL = '<?php echo BASE_URL; ?>/api/products';
+const CSRF_TOKEN = '<?php echo $csrf_token; ?>';
+let currentImageUrl = null;
 
-function viewProduct(id) {
-    window.location.href = '<?php echo BASE_URL; ?>/public/productos';
-}
-
-function editProduct(id) {
-    alert('Editar producto #' + id + '\n(Funcionalidad pendiente)');
-}
-
-function deleteProduct(id, nombre) {
-    if (confirm('¿Estás seguro de eliminar el producto "' + nombre + '"?\n\nEsta acción no se puede deshacer.')) {
-        alert('Eliminar producto #' + id + '\n(Funcionalidad pendiente)');
+function openModal(isEdit = false) {
+    document.getElementById('productModal').classList.remove('hidden');
+    document.getElementById('productModal').classList.add('flex');
+    document.getElementById('modalTitle').textContent = isEdit ? 'Editar Producto' : 'Nuevo Producto';
+    
+    if (!isEdit) {
+        document.getElementById('productForm').reset();
+        document.getElementById('productId').value = '';
+        document.getElementById('imagePreviewContainer').classList.add('hidden');
+        currentImageUrl = null;
     }
 }
+
+function closeModal() {
+    document.getElementById('productModal').classList.add('hidden');
+    document.getElementById('productModal').classList.remove('flex');
+}
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('imagePreview').src = e.target.result;
+            document.getElementById('imagePreviewContainer').classList.remove('hidden');
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeImage() {
+    document.getElementById('productImagen').value = '';
+    document.getElementById('imagePreviewContainer').classList.add('hidden');
+    currentImageUrl = null;
+}
+
+async function editProduct(id) {
+    try {
+        const response = await fetch(`${API_URL}?action=get&id=${id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const product = data.data;
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productNombre').value = product.nombre;
+            document.getElementById('productDescripcion').value = product.descripcion || '';
+            document.getElementById('productCategoria').value = product.id_categoria;
+            document.getElementById('productPrecio').value = product.precio;
+            document.getElementById('productStock').value = product.stock;
+            
+            if (product.imagen_url) {
+                document.getElementById('imagePreview').src = product.imagen_url;
+                document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                currentImageUrl = product.imagen_url;
+            } else {
+                document.getElementById('imagePreviewContainer').classList.add('hidden');
+                currentImageUrl = null;
+            }
+            
+            openModal(true);
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar el producto');
+    }
+}
+
+async function deleteProduct(id, nombre) {
+    if (!confirm(`¿Estás seguro de eliminar el producto "${nombre}"?\n\nEsta acción no se puede deshacer.`)) {
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('id', id);
+        formData.append('csrf_token', CSRF_TOKEN);
+        
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar el producto');
+    }
+}
+
+document.getElementById('productForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
+    
+    const formData = new FormData(this);
+    const productId = document.getElementById('productId').value;
+    formData.append('action', productId ? 'update' : 'create');
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al guardar el producto');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Guardar';
+    }
+});
+
+// Cerrar modal con Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+});
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('productModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
 </script>
 
 <?php require_once __DIR__ . '/../layouts/footer.php'; ?>
