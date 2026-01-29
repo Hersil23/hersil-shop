@@ -72,7 +72,7 @@ $current_page = $_SERVER['REQUEST_URI'];
                     
                     <a href="<?php echo BASE_URL; ?>/productos" 
                        class="px-4 py-2 rounded-lg transition-colors <?php echo strpos($current_page, '/productos') !== false ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
-                        <i class="fas fa-shopping-bag mr-2"></i>Productos
+                        <i class="fas fa-shopping-bag mr-2"></i>Catálogo
                     </a>
 
                     <?php if ($isLoggedIn): ?>
