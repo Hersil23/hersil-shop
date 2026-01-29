@@ -1,239 +1,333 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 /**
- * ProductController
- * Maneja productos: listar, buscar, filtrar, CRUD (admin)
+ * Controlador de Productos
+ * Maneja las operaciones CRUD de productos
  */
 
-session_start();
+require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/product.php';
 require_once __DIR__ . '/../models/category.php';
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../utils/Security.php';
+require_once __DIR__ . '/../utils/BunnyStorage.php';
+require_once __DIR__ . '/../utils/ImageCompressor.php';
 
 class ProductController {
     private $productModel;
     private $categoryModel;
+    private $bunnyStorage;
+    private $imageCompressor;
 
     public function __construct() {
         $this->productModel = new Product();
         $this->categoryModel = new Category();
+        $this->bunnyStorage = new BunnyStorage();
+        $this->imageCompressor = new ImageCompressor(1200, 1200, 85);
     }
 
-    // Listar todos los productos
-    public function listProducts() {
-        return $this->productModel->getAll();
-    }
-
-    // Filtrar productos por categoría
-    public function filterByCategory($categoria_id) {
-        return $this->productModel->getByCategory($categoria_id);
-    }
-
-    // Buscar productos
-    public function searchProducts($keyword) {
-        if (empty($keyword)) {
-            return $this->productModel->getAll();
+    /**
+     * Crear nuevo producto
+     */
+    public function create() {
+        if (!isAdmin()) {
+            return ['success' => false, 'message' => 'No autorizado'];
         }
-        return $this->productModel->search($keyword);
-    }
 
-    // Obtener producto por ID
-    public function getProductById($id) {
-        return $this->productModel->getById($id);
-    }
-
-    // ============================================
-    // FUNCIONES DE ADMINISTRACIÓN (Solo Admin)
-    // ============================================
-
-    // Crear nuevo producto (Admin)
-    public function createProduct() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Verificar que sea administrador
-            if (!isAdmin()) {
-                redirect('/');
-                return;
-            }
-
-            // Obtener y sanitizar datos
-            $nombre = sanitize($_POST['nombre'] ?? '');
-            $descripcion = sanitize($_POST['descripcion'] ?? '');
-            $id_categoria = intval($_POST['id_categoria'] ?? 0);
-            $stock = intval($_POST['stock'] ?? 0);
-            $precio = floatval($_POST['precio'] ?? 0);
-
-            // Validaciones
-            $errors = [];
-
-            if (empty($nombre)) {
-                $errors[] = "El nombre del producto es requerido";
-            }
-
-            if (empty($descripcion)) {
-                $errors[] = "La descripción es requerida";
-            }
-
-            if ($id_categoria <= 0) {
-                $errors[] = "Debes seleccionar una categoría válida";
-            }
-
-            if ($stock < 0) {
-                $errors[] = "El stock no puede ser negativo";
-            }
-
-            if ($precio <= 0) {
-                $errors[] = "El precio debe ser mayor a 0";
-            }
-
-            if (!empty($errors)) {
-                $_SESSION['errors'] = $errors;
-                $_SESSION['form_data'] = $_POST;
-                redirect('/admin/productos?action=create');
-                return;
-            }
-
-            // Crear producto
-            $this->productModel->id_usuario = $_SESSION['user_id'];
-            $this->productModel->id_categoria = $id_categoria;
-            $this->productModel->nombre = $nombre;
-            $this->productModel->descripcion = $descripcion;
-            $this->productModel->stock = $stock;
-            $this->productModel->precio = $precio;
-
-            if ($this->productModel->create()) {
-                $_SESSION['success'] = "Producto creado exitosamente";
-                redirect('/admin/productos');
-            } else {
-                $_SESSION['error'] = "Error al crear el producto";
-                redirect('/admin/productos?action=create');
-            }
+        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            return ['success' => false, 'message' => 'Token de seguridad inválido'];
         }
-    }
 
-    // Actualizar producto (Admin)
-    public function updateProduct() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Verificar que sea administrador
-            if (!isAdmin()) {
-                redirect('/');
-                return;
-            }
+        $nombre = Security::sanitize($_POST['nombre'] ?? '');
+        $descripcion = Security::sanitize($_POST['descripcion'] ?? '');
+        $id_categoria = intval($_POST['id_categoria'] ?? 0);
+        $stock = intval($_POST['stock'] ?? 0);
+        $precio = floatval($_POST['precio'] ?? 0);
 
-            $id = intval($_POST['id'] ?? 0);
-            $nombre = sanitize($_POST['nombre'] ?? '');
-            $descripcion = sanitize($_POST['descripcion'] ?? '');
-            $id_categoria = intval($_POST['id_categoria'] ?? 0);
-            $stock = intval($_POST['stock'] ?? 0);
-            $precio = floatval($_POST['precio'] ?? 0);
-
-            // Validaciones
-            $errors = [];
-
-            if (empty($nombre)) {
-                $errors[] = "El nombre del producto es requerido";
-            }
-
-            if (empty($descripcion)) {
-                $errors[] = "La descripción es requerida";
-            }
-
-            if ($id_categoria <= 0) {
-                $errors[] = "Debes seleccionar una categoría válida";
-            }
-
-            if ($stock < 0) {
-                $errors[] = "El stock no puede ser negativo";
-            }
-
-            if ($precio <= 0) {
-                $errors[] = "El precio debe ser mayor a 0";
-            }
-
-            if (!empty($errors)) {
-                $_SESSION['errors'] = $errors;
-                redirect('/admin/productos?action=edit&id=' . $id);
-                return;
-            }
-
-            // Actualizar producto
-            $this->productModel->id = $id;
-            $this->productModel->id_categoria = $id_categoria;
-            $this->productModel->nombre = $nombre;
-            $this->productModel->descripcion = $descripcion;
-            $this->productModel->stock = $stock;
-            $this->productModel->precio = $precio;
-
-            if ($this->productModel->update()) {
-                $_SESSION['success'] = "Producto actualizado correctamente";
-                redirect('/admin/productos');
-            } else {
-                $_SESSION['error'] = "Error al actualizar el producto";
-                redirect('/admin/productos?action=edit&id=' . $id);
-            }
+        if (empty($nombre)) {
+            return ['success' => false, 'message' => 'El nombre es requerido'];
         }
+
+        if ($id_categoria <= 0) {
+            return ['success' => false, 'message' => 'Selecciona una categoría válida'];
+        }
+
+        if ($precio <= 0) {
+            return ['success' => false, 'message' => 'El precio debe ser mayor a 0'];
+        }
+
+        if ($stock < 0) {
+            return ['success' => false, 'message' => 'El stock no puede ser negativo'];
+        }
+
+        // Procesar imagen si se subió
+        $imagen_url = null;
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            $uploadResult = $this->uploadImage($_FILES['imagen']);
+            if (!$uploadResult['success']) {
+                return $uploadResult;
+            }
+            $imagen_url = $uploadResult['url'];
+        }
+
+        // Crear producto
+        $this->productModel->id_usuario = $_SESSION['user_id'];
+        $this->productModel->id_categoria = $id_categoria;
+        $this->productModel->nombre = $nombre;
+        $this->productModel->descripcion = $descripcion;
+        $this->productModel->imagen_url = $imagen_url;
+        $this->productModel->stock = $stock;
+        $this->productModel->precio = $precio;
+
+        if ($this->productModel->create()) {
+            Security::logAdminAction('create_product', ['id' => $this->productModel->id, 'nombre' => $nombre]);
+            return ['success' => true, 'message' => 'Producto creado correctamente', 'id' => $this->productModel->id];
+        }
+
+        return ['success' => false, 'message' => 'Error al crear el producto'];
     }
 
-    // Eliminar producto (Admin)
-    public function deleteProduct() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Verificar que sea administrador
-            if (!isAdmin()) {
-                redirect('/');
-                return;
+    /**
+     * Actualizar producto
+     */
+    public function update() {
+        if (!isAdmin()) {
+            return ['success' => false, 'message' => 'No autorizado'];
+        }
+
+        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            return ['success' => false, 'message' => 'Token de seguridad inválido'];
+        }
+
+        $id = intval($_POST['id'] ?? 0);
+        $nombre = Security::sanitize($_POST['nombre'] ?? '');
+        $descripcion = Security::sanitize($_POST['descripcion'] ?? '');
+        $id_categoria = intval($_POST['id_categoria'] ?? 0);
+        $stock = intval($_POST['stock'] ?? 0);
+        $precio = floatval($_POST['precio'] ?? 0);
+
+        if ($id <= 0) {
+            return ['success' => false, 'message' => 'ID inválido'];
+        }
+
+        if (empty($nombre)) {
+            return ['success' => false, 'message' => 'El nombre es requerido'];
+        }
+
+        if ($id_categoria <= 0) {
+            return ['success' => false, 'message' => 'Selecciona una categoría válida'];
+        }
+
+        if ($precio <= 0) {
+            return ['success' => false, 'message' => 'El precio debe ser mayor a 0'];
+        }
+
+        if ($stock < 0) {
+            return ['success' => false, 'message' => 'El stock no puede ser negativo'];
+        }
+
+        // Verificar que existe
+        $producto = $this->productModel->getById($id);
+        if (!$producto) {
+            return ['success' => false, 'message' => 'Producto no encontrado'];
+        }
+
+        // Procesar nueva imagen si se subió
+        $imagen_url = $producto['imagen_url'];
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            // Eliminar imagen anterior si existe
+            if (!empty($producto['imagen_url'])) {
+                $this->bunnyStorage->delete($producto['imagen_url']);
             }
-
-            $id = intval($_POST['id'] ?? 0);
-
-            // Eliminar (soft delete)
-            $this->productModel->id = $id;
             
-            if ($this->productModel->delete($_SESSION['user_id'])) {
-                $_SESSION['success'] = "Producto eliminado correctamente";
-            } else {
-                $_SESSION['error'] = "Error al eliminar el producto";
+            $uploadResult = $this->uploadImage($_FILES['imagen']);
+            if (!$uploadResult['success']) {
+                return $uploadResult;
             }
-
-            redirect('/admin/productos');
+            $imagen_url = $uploadResult['url'];
         }
+
+        // Actualizar
+        $this->productModel->id = $id;
+        $this->productModel->id_categoria = $id_categoria;
+        $this->productModel->nombre = $nombre;
+        $this->productModel->descripcion = $descripcion;
+        $this->productModel->imagen_url = $imagen_url;
+        $this->productModel->stock = $stock;
+        $this->productModel->precio = $precio;
+
+        if ($this->productModel->update()) {
+            Security::logAdminAction('update_product', ['id' => $id, 'nombre' => $nombre]);
+            return ['success' => true, 'message' => 'Producto actualizado correctamente'];
+        }
+
+        return ['success' => false, 'message' => 'Error al actualizar el producto'];
     }
 
-    // Obtener productos con stock bajo (Admin)
-    public function getLowStockProducts() {
+    /**
+     * Eliminar producto (soft delete)
+     */
+    public function delete() {
         if (!isAdmin()) {
-            redirect('/');
-            return;
+            return ['success' => false, 'message' => 'No autorizado'];
         }
 
-        return $this->productModel->getLowStock();
+        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            return ['success' => false, 'message' => 'Token de seguridad inválido'];
+        }
+
+        $id = intval($_POST['id'] ?? 0);
+
+        if ($id <= 0) {
+            return ['success' => false, 'message' => 'ID inválido'];
+        }
+
+        $producto = $this->productModel->getById($id);
+        if (!$producto) {
+            return ['success' => false, 'message' => 'Producto no encontrado'];
+        }
+
+        $this->productModel->id = $id;
+
+        if ($this->productModel->delete($_SESSION['user_id'])) {
+            Security::logAdminAction('delete_product', ['id' => $id, 'nombre' => $producto['nombre']]);
+            return ['success' => true, 'message' => 'Producto eliminado correctamente'];
+        }
+
+        return ['success' => false, 'message' => 'Error al eliminar el producto'];
     }
 
-    // Obtener estadísticas de productos por categoría (Admin)
-    public function getProductStats() {
+    /**
+     * Obtener producto por ID (para editar)
+     */
+    public function get() {
         if (!isAdmin()) {
-            redirect('/');
-            return;
+            return ['success' => false, 'message' => 'No autorizado'];
         }
 
-        return $this->productModel->countByCategory();
+        $id = intval($_GET['id'] ?? 0);
+
+        if ($id <= 0) {
+            return ['success' => false, 'message' => 'ID inválido'];
+        }
+
+        $producto = $this->productModel->getById($id);
+
+        if ($producto) {
+            return ['success' => true, 'data' => $producto];
+        }
+
+        return ['success' => false, 'message' => 'Producto no encontrado'];
+    }
+
+    /**
+     * Listar todos los productos
+     */
+    public function list() {
+        if (!isAdmin()) {
+            return ['success' => false, 'message' => 'No autorizado'];
+        }
+
+        $productos = $this->productModel->getAll();
+        return ['success' => true, 'data' => $productos];
+    }
+
+    /**
+     * Eliminar solo la imagen
+     */
+    public function deleteImage() {
+        if (!isAdmin()) {
+            return ['success' => false, 'message' => 'No autorizado'];
+        }
+
+        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            return ['success' => false, 'message' => 'Token de seguridad inválido'];
+        }
+
+        $id = intval($_POST['id'] ?? 0);
+
+        if ($id <= 0) {
+            return ['success' => false, 'message' => 'ID inválido'];
+        }
+
+        $producto = $this->productModel->getById($id);
+        if (!$producto) {
+            return ['success' => false, 'message' => 'Producto no encontrado'];
+        }
+
+        // Eliminar de Bunny
+        if (!empty($producto['imagen_url'])) {
+            $this->bunnyStorage->delete($producto['imagen_url']);
+        }
+
+        // Actualizar BD
+        if ($this->productModel->updateImage($id, null)) {
+            return ['success' => true, 'message' => 'Imagen eliminada correctamente'];
+        }
+
+        return ['success' => false, 'message' => 'Error al eliminar la imagen'];
+    }
+
+    /**
+     * Subir y comprimir imagen
+     */
+    private function uploadImage($file) {
+        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        $validation = Security::validateUpload($file, $allowedTypes, 5 * 1024 * 1024);
+
+        if (!$validation['valid']) {
+            return ['success' => false, 'message' => implode(', ', $validation['errors'])];
+        }
+
+        $compressed = $this->imageCompressor->compressFromUpload($file);
+
+        if (!$compressed['success']) {
+            return ['success' => false, 'message' => $compressed['message']];
+        }
+
+        $fileName = 'prod_' . uniqid() . '_' . time() . '.jpg';
+        $uploadResult = $this->bunnyStorage->upload($compressed['path'], 'products/' . $fileName);
+
+        $this->imageCompressor->cleanup($compressed['path']);
+
+        if ($uploadResult['success']) {
+            return ['success' => true, 'url' => $uploadResult['url']];
+        }
+
+        return ['success' => false, 'message' => 'Error al subir la imagen'];
     }
 }
 
-// Procesar acciones según la petición
-if (isset($_GET['action'])) {
+// Procesar peticiones AJAX
+if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET') {
     $controller = new ProductController();
-    
-    switch ($_GET['action']) {
-        case 'admin-create':
-            $controller->createProduct();
+    $action = $_REQUEST['action'] ?? '';
+
+    $response = ['success' => false, 'message' => 'Acción no válida'];
+
+    switch ($action) {
+        case 'create':
+            $response = $controller->create();
             break;
-        case 'admin-update':
-            $controller->updateProduct();
+        case 'update':
+            $response = $controller->update();
             break;
-        case 'admin-delete':
-            $controller->deleteProduct();
+        case 'delete':
+            $response = $controller->delete();
             break;
-        default:
-            redirect('/');
+        case 'get':
+            $response = $controller->get();
+            break;
+        case 'list':
+            $response = $controller->list();
+            break;
+        case 'delete_image':
+            $response = $controller->deleteImage();
             break;
     }
+
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 ?>

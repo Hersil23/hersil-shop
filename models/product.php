@@ -33,20 +33,20 @@ class Product {
                       id_categoria = :id_categoria,
                       nombre = :nombre,
                       descripcion = :descripcion,
+                      imagen_url = :imagen_url,
                       stock = :stock,
                       precio = :precio";
 
         $stmt = $this->conn->prepare($query);
 
-        // Sanitizar datos
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->descripcion = htmlspecialchars(strip_tags($this->descripcion));
 
-        // Bind de parámetros
         $stmt->bindParam(':id_usuario', $this->id_usuario);
         $stmt->bindParam(':id_categoria', $this->id_categoria);
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':descripcion', $this->descripcion);
+        $stmt->bindParam(':imagen_url', $this->imagen_url);
         $stmt->bindParam(':stock', $this->stock);
         $stmt->bindParam(':precio', $this->precio);
 
@@ -130,23 +130,36 @@ class Product {
                   SET id_categoria = :id_categoria,
                       nombre = :nombre,
                       descripcion = :descripcion,
+                      imagen_url = :imagen_url,
                       stock = :stock,
                       precio = :precio
                   WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
 
-        // Sanitizar datos
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->descripcion = htmlspecialchars(strip_tags($this->descripcion));
 
-        // Bind de parámetros
         $stmt->bindParam(':id_categoria', $this->id_categoria);
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':descripcion', $this->descripcion);
+        $stmt->bindParam(':imagen_url', $this->imagen_url);
         $stmt->bindParam(':stock', $this->stock);
         $stmt->bindParam(':precio', $this->precio);
         $stmt->bindParam(':id', $this->id);
+
+        return $stmt->execute();
+    }
+
+    // Actualizar solo la imagen
+    public function updateImage($id, $imagen_url) {
+        $query = "UPDATE " . $this->table . " 
+                  SET imagen_url = :imagen_url 
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':imagen_url', $imagen_url);
+        $stmt->bindParam(':id', $id);
 
         return $stmt->execute();
     }
