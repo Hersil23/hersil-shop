@@ -93,6 +93,9 @@ switch ($request) {
 case '/api/categories':
         require_once __DIR__ . '/../controllers/CategoryController.php';
         break;
+case '/api/products':
+        require_once __DIR__ . '/../controllers/ProductController.php';
+        break;
         
     default:
         http_response_code(404);
