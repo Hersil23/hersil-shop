@@ -15,23 +15,23 @@ $categories = $categoryModel->getActiveCategories();
 <section class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 text-white py-12 md:py-20">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row items-center gap-8">
-            
+
             <div class="w-full md:w-1/2 text-center md:text-left">
                 <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
-                    Los Mejores Productos <span class="text-blue-300">Electrónicos</span>
+                    Tu Tienda Online <span class="text-blue-300">por Categoría de Confianza</span>
                 </h1>
                 <p class="text-base md:text-lg text-blue-100 mb-6 md:mb-8">
-                    Descubre nuestra amplia selección de tecnología de última generación. 
-                    Calidad garantizada y los mejores precios del mercado.
+                    Explora nuestros departamentos: electrónica, hogar, moda, juguetes para adultos y más.
+                    Productos nuevos y usados a los mejores precios.
                 </p>
-                
+
                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
-                    <a href="<?php echo BASE_URL; ?>/productos" 
+                    <a href="<?php echo BASE_URL; ?>/productos"
                        class="w-full sm:w-auto bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg text-center">
-                        <i class="fas fa-shopping-bag mr-2"></i>Ver Productos
+                        <i class="fas fa-shopping-bag mr-2"></i>Catálogo
                     </a>
                     <?php if (!isLoggedIn()): ?>
-                    <a href="<?php echo BASE_URL; ?>/register" 
+                    <a href="<?php echo BASE_URL; ?>/register"
                        class="w-full sm:w-auto bg-blue-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-600 transition-all border-2 border-white text-center">
                         <i class="fas fa-user-plus mr-2"></i>Registrarse
                     </a>
@@ -42,7 +42,7 @@ $categories = $categoryModel->getActiveCategories();
             <div class="w-full md:w-1/2 flex justify-center">
                 <div class="relative">
                     <div class="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border-4 border-white/20 shadow-2xl">
-                        <i class="fas fa-laptop text-6xl md:text-8xl lg:text-9xl text-white/90"></i>
+                        <i class="fas fa-store text-6xl md:text-8xl lg:text-9xl text-white/90"></i>
                     </div>
                     <div class="absolute -top-4 -right-4 w-16 h-16 md:w-20 md:h-20 bg-blue-400 rounded-full animate-pulse"></div>
                     <div class="absolute -bottom-4 -left-4 w-12 h-12 md:w-16 md:h-16 bg-blue-300 rounded-full animate-pulse delay-75"></div>
@@ -104,7 +104,7 @@ $categories = $categoryModel->getActiveCategories();
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
             <?php foreach ($categories as $category): ?>
-                <a href="<?php echo BASE_URL; ?>/productos?categoria=<?php echo $category['id']; ?>" 
+                <a href="<?php echo BASE_URL; ?>/productos?categoria=<?php echo $category['id']; ?>"
                    class="group bg-white dark:bg-slate-800 p-4 md:p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
                     <div class="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4 group-hover:scale-110 transition-transform">
                         <i class="fas fa-folder text-xl md:text-2xl text-white"></i>
@@ -135,7 +135,7 @@ $categories = $categoryModel->getActiveCategories();
                 <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all hover:shadow-2xl">
                     <div class="h-48 md:h-56 bg-slate-200 dark:bg-slate-700 overflow-hidden">
                         <?php if (!empty($product['imagen_url'])): ?>
-                            <img src="<?php echo htmlspecialchars($product['imagen_url']); ?>" 
+                            <img src="<?php echo htmlspecialchars($product['imagen_url']); ?>"
                                 alt="<?php echo htmlspecialchars($product['nombre']); ?>"
                                 class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
                         <?php else: ?>
@@ -143,21 +143,21 @@ $categories = $categoryModel->getActiveCategories();
                                 <i class="fas fa-box text-5xl md:text-6xl text-slate-400 dark:text-slate-500"></i>
                             </div>
                         <?php endif; ?>
-                    </div>                    
-                    
+                    </div>
+
                     <div class="p-4 md:p-5">
                         <span class="inline-block px-2 md:px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs rounded-full mb-2">
                             <?php echo htmlspecialchars($product['categoria_nombre'] ?? 'Sin categoría'); ?>
                         </span>
-                        
+
                         <h3 class="font-bold text-base md:text-lg mb-2 line-clamp-2 min-h-[3rem]">
                             <?php echo htmlspecialchars($product['nombre']); ?>
                         </h3>
-                        
+
                         <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 mb-3 md:mb-4 line-clamp-2">
                             <?php echo htmlspecialchars(substr($product['descripcion'], 0, 80)) . '...'; ?>
                         </p>
-                        
+
                         <div class="flex items-center justify-between mb-3 md:mb-4">
                             <span class="text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400">
                                 $<?php echo number_format($product['precio'], 2); ?>
@@ -167,8 +167,8 @@ $categories = $categoryModel->getActiveCategories();
                                 <?php echo $product['stock'] > 0 ? 'Stock: ' . $product['stock'] : 'Agotado'; ?>
                             </span>
                         </div>
-                        
-                        <a href="<?php echo BASE_URL; ?>/producto?id=<?php echo $product['id']; ?>" 
+
+                        <a href="<?php echo BASE_URL; ?>/producto?id=<?php echo $product['id']; ?>"
                            class="block w-full bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 md:py-3 rounded-lg transition-colors font-semibold text-sm md:text-base text-center">
                             <i class="fas fa-eye mr-2"></i>Ver Detalles
                         </a>
@@ -178,7 +178,7 @@ $categories = $categoryModel->getActiveCategories();
         </div>
 
         <div class="text-center mt-8 md:mt-12">
-            <a href="<?php echo BASE_URL; ?>/productos" 
+            <a href="<?php echo BASE_URL; ?>/productos"
                class="inline-block bg-blue-800 hover:bg-blue-900 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
                 Ver Todos los Productos
                 <i class="fas fa-arrow-right ml-2"></i>
@@ -195,7 +195,7 @@ $categories = $categoryModel->getActiveCategories();
             <p class="text-base md:text-lg text-blue-100 mb-6 md:mb-8 max-w-2xl mx-auto">
                 Regístrate ahora y obtén acceso a ofertas exclusivas y los mejores productos del mercado
             </p>
-            <a href="<?php echo BASE_URL; ?>/register" 
+            <a href="<?php echo BASE_URL; ?>/register"
                class="inline-block bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg text-sm md:text-base">
                 <i class="fas fa-rocket mr-2"></i>Comenzar Ahora
             </a>
@@ -203,5 +203,4 @@ $categories = $categoryModel->getActiveCategories();
     </div>
 </section>
 
-<?php require_once __DIR__ . '/layouts/footer.php'; ?>
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>

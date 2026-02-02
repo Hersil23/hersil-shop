@@ -20,11 +20,11 @@ $current_page = $_SERVER['REQUEST_URI'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title ?? 'Hersil Shop'; ?> - Tienda de Electrónica</title>
-    
+    <title><?php echo $page_title ?? 'TwistPro'; ?> - Tu Tienda Online</title>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Configuración personalizada de Tailwind -->
     <script>
         tailwind.config = {
@@ -42,26 +42,26 @@ $current_page = $_SERVER['REQUEST_URI'];
             }
         }
     </script>
-    
+
     <!-- CSS Personalizado -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/public/css/styles.css">
-    
+
     <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-    
+
    <!-- Navbar -->
     <nav class="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-20 md:h-24">
-                
+
                 <!-- Logo -->
                 <a href="<?php echo BASE_URL; ?>/" class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-800 to-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-bolt text-white text-xl"></i>
+                        <i class="fas fa-shopping-cart text-white text-xl"></i>
                     </div>
-                    <span class="text-xl font-bold text-slate-900 dark:text-white">Hersil Shop</span>
+                    <span class="text-xl font-bold text-slate-900 dark:text-white">TwistPro</span>
                 </a>
 
                 <!-- Desktop Menu -->
@@ -69,8 +69,8 @@ $current_page = $_SERVER['REQUEST_URI'];
                     <a href="<?php echo BASE_URL; ?>/" class="px-4 py-2 rounded-lg transition-colors <?php echo (strpos($current_page, '/inicio') !== false || $current_page === '/' || strpos($current_page, '/home') !== false) ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
                         <i class="fas fa-home mr-2"></i>Inicio
                     </a>
-                    
-                    <a href="<?php echo BASE_URL; ?>/productos" 
+
+                    <a href="<?php echo BASE_URL; ?>/productos"
                        class="px-4 py-2 rounded-lg transition-colors <?php echo strpos($current_page, '/productos') !== false ? 'bg-blue-800 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'; ?>">
                         <i class="fas fa-shopping-bag mr-2"></i>Catálogo
                     </a>
@@ -122,14 +122,14 @@ $current_page = $_SERVER['REQUEST_URI'];
                             class="px-4 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
                             <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
                         </a>
-                        <a href="<?php echo BASE_URL; ?>/register" 
+                        <a href="<?php echo BASE_URL; ?>/register"
                             class="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white rounded-lg transition-colors">
                             <i class="fas fa-user-plus mr-2"></i>Registrarse
                         </a>
                     <?php endif; ?>
 
                     <!-- Toggle Tema Desktop -->
-                    <button onclick="toggleTheme()" id="theme-toggle" 
+                    <button onclick="toggleTheme()" id="theme-toggle"
                             class="ml-2 p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
                         <span id="theme-icon">
                             <i class="fas fa-moon text-lg"></i>
@@ -140,13 +140,13 @@ $current_page = $_SERVER['REQUEST_URI'];
                 <!-- Mobile: Botones Toggle Tema + Hamburguesa -->
                 <div class="md:hidden flex items-center space-x-2">
                     <!-- Toggle Tema Mobile -->
-                    <button onclick="toggleTheme()" id="theme-toggle-mobile" 
+                    <button onclick="toggleTheme()" id="theme-toggle-mobile"
                             class="p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
                         <span id="theme-icon-mobile">
                             <i class="fas fa-moon text-lg"></i>
                         </span>
                     </button>
-                    
+
                     <!-- Hamburguesa -->
                     <button id="mobile-menu-button" class="p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800">
                         <i class="fas fa-bars text-xl"></i>
@@ -156,7 +156,7 @@ $current_page = $_SERVER['REQUEST_URI'];
 
             <!-- Mobile Menu Overlay (desde la derecha) -->
             <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"></div>
-            
+
             <!-- Mobile Menu (slide desde la derecha) -->
             <div id="mobile-menu" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-900 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
                 <!-- Header del menú -->
@@ -173,9 +173,9 @@ $current_page = $_SERVER['REQUEST_URI'];
                         <i class="fas fa-home mr-3 w-5"></i>Inicio
                     </a>
                     <a href="<?php echo BASE_URL; ?>/productos" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
-                        <i class="fas fa-shopping-bag mr-3 w-5"></i>Productos
+                        <i class="fas fa-shopping-bag mr-3 w-5"></i>Catálogo
                     </a>
-                    
+
                     <?php if ($isLoggedIn): ?>
                         <?php if ($isAdmin): ?>
                             <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
@@ -191,7 +191,7 @@ $current_page = $_SERVER['REQUEST_URI'];
                                 </a>
                             </div>
                         <?php endif; ?>
-                        
+
                         <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
                             <div class="px-4 py-2 mb-2">
                                 <p class="font-semibold"><?php echo $currentUser['nombre'] . ' ' . $currentUser['apellido']; ?></p>
