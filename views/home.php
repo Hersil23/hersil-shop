@@ -18,7 +18,7 @@ $categories = $categoryModel->getActiveCategories();
 
             <div class="w-full md:w-1/2 text-center md:text-left">
                 <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
-                    Tu Tienda Online <span class="text-blue-300">por Categoría de Confianza</span>
+                    Tu Tienda Online <span class="text-blue-300">de Confianza</span>
                 </h1>
                 <p class="text-base md:text-lg text-blue-100 mb-6 md:mb-8">
                     Explora nuestros departamentos: electrónica, hogar, moda, juguetes para adultos y más.
@@ -180,7 +180,7 @@ $categories = $categoryModel->getActiveCategories();
         <div class="text-center mt-8 md:mt-12">
             <a href="<?php echo BASE_URL; ?>/productos"
                class="inline-block bg-blue-800 hover:bg-blue-900 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
-                Ver Todos los Productos
+                Ver Todo el Catálogo
                 <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>

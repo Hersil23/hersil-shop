@@ -10,13 +10,13 @@
                 <div class="text-center md:text-left">
                     <div class="flex items-center justify-center md:justify-start space-x-3 mb-4">
                         <div class="w-10 h-10 bg-gradient-to-br from-blue-800 to-blue-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-bolt text-white"></i>
+                            <i class="fas fa-shopping-cart text-white"></i>
                         </div>
-                        <span class="text-xl font-bold">Hersil Shop</span>
+                        <span class="text-xl font-bold">TwistPro</span>
                     </div>
                     <p class="text-slate-600 dark:text-slate-400 text-sm">
-                        Tu tienda de confianza para productos electrónicos de calidad. 
-                        Los mejores precios y servicio al cliente.
+                        Tu tienda online de confianza. Productos nuevos y usados 
+                        a los mejores precios con el mejor servicio al cliente.
                     </p>
                 </div>
 
@@ -35,7 +35,7 @@
                             <a href="<?php echo BASE_URL; ?>/productos" 
                                class="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center md:justify-start">
                                 <i class="fas fa-shopping-bag w-5"></i>
-                                <span>Productos</span>
+                                <span>Catálogo</span>
                             </a>
                         </li>
                         <?php if (!isLoggedIn()): ?>
@@ -87,13 +87,13 @@
                 <div class="text-center space-y-4">
                     <!-- Copyright principal -->
                     <p class="text-sm text-slate-600 dark:text-slate-400">
-                        &copy; <?php echo date('Y'); ?> Hersil Shop. Todos los derechos reservados.
+                        &copy; <?php echo date('Y'); ?> TwistPro. Todos los derechos reservados.
                     </p>
                     
                     <!-- Desarrollador -->
                     <div class="flex flex-col items-center space-y-3">
                         <p class="text-sm text-slate-500 dark:text-slate-500">
-                            Desarrollado por <a href="https://herasi.dev" target="_blank" rel="noopener" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">@herasi.dev</a>
+                            Creado por <a href="https://herasi.dev" target="_blank" rel="noopener" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">@herasi.dev</a>
                         </p>
                         
                         <!-- Redes sociales del desarrollador -->
