@@ -225,20 +225,55 @@ $csrf_token = Security::generateCSRFToken();
                 </div>
                 
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-semibold mb-2">Imagen</label>
+                    <label class="block text-sm font-semibold mb-2">Imagen Principal</label>
                     <div id="imagePreviewContainer" class="hidden mb-4">
                         <div class="relative inline-block">
                             <img id="imagePreview" src="" alt="Preview" class="w-32 h-32 object-cover rounded-lg border border-slate-300 dark:border-slate-600">
-                            <button type="button" onclick="removeImage()" 
+                            <button type="button" onclick="removeImage(1)"
                                     class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors">
                                 <i class="fas fa-times text-xs"></i>
                             </button>
                         </div>
                     </div>
                     <input type="file" name="imagen" id="productImagen" accept="image/*"
-                           onchange="previewImage(this)"
+                           onchange="previewImageN(this, 1)"
                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 dark:file:bg-blue-900/30 dark:file:text-blue-400">
-                    <p class="text-xs text-slate-500 mt-1">Formatos: JPG, PNG, GIF, WebP. Máximo 5MB.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Imagen 2 (opcional)</label>
+                    <div id="imagePreviewContainer2" class="hidden mb-4">
+                        <div class="relative inline-block">
+                            <img id="imagePreview2" src="" alt="Preview 2" class="w-32 h-32 object-cover rounded-lg border border-slate-300 dark:border-slate-600">
+                            <button type="button" onclick="removeImage(2)"
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" name="imagen_2" id="productImagen2" accept="image/*"
+                           onchange="previewImageN(this, 2)"
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 dark:file:bg-blue-900/30 dark:file:text-blue-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Imagen 3 (opcional)</label>
+                    <div id="imagePreviewContainer3" class="hidden mb-4">
+                        <div class="relative inline-block">
+                            <img id="imagePreview3" src="" alt="Preview 3" class="w-32 h-32 object-cover rounded-lg border border-slate-300 dark:border-slate-600">
+                            <button type="button" onclick="removeImage(3)"
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" name="imagen_3" id="productImagen3" accept="image/*"
+                           onchange="previewImageN(this, 3)"
+                           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-100 file:text-blue-700 dark:file:bg-blue-900/30 dark:file:text-blue-400">
+                </div>
+
+                <div class="md:col-span-2">
+                    <p class="text-xs text-slate-500">Formatos: JPG, PNG, GIF, WebP. Máximo 5MB por imagen.</p>
                 </div>
             </div>
             
@@ -259,18 +294,24 @@ $csrf_token = Security::generateCSRFToken();
 <script>
 const API_URL = '<?php echo BASE_URL; ?>/api/products';
 const CSRF_TOKEN = '<?php echo $csrf_token; ?>';
-let currentImageUrl = null;
+let currentImageUrls = { 1: null, 2: null, 3: null };
 
 function openModal(isEdit = false) {
     document.getElementById('productModal').classList.remove('hidden');
     document.getElementById('productModal').classList.add('flex');
     document.getElementById('modalTitle').textContent = isEdit ? 'Editar Producto' : 'Nuevo Producto';
-    
+
     if (!isEdit) {
         document.getElementById('productForm').reset();
         document.getElementById('productId').value = '';
-        document.getElementById('imagePreviewContainer').classList.add('hidden');
-        currentImageUrl = null;
+        document.getElementById('productImagen').value = '';
+        document.getElementById('productImagen2').value = '';
+        document.getElementById('productImagen3').value = '';
+        for (let i = 1; i <= 3; i++) {
+            const suffix = i === 1 ? '' : i;
+            document.getElementById('imagePreviewContainer' + suffix).classList.add('hidden');
+            currentImageUrls[i] = null;
+        }
     }
 }
 
@@ -279,28 +320,31 @@ function closeModal() {
     document.getElementById('productModal').classList.remove('flex');
 }
 
-function previewImage(input) {
+function previewImageN(input, n) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
+        const suffix = n === 1 ? '' : n;
         reader.onload = function(e) {
-            document.getElementById('imagePreview').src = e.target.result;
-            document.getElementById('imagePreviewContainer').classList.remove('hidden');
+            document.getElementById('imagePreview' + suffix).src = e.target.result;
+            document.getElementById('imagePreviewContainer' + suffix).classList.remove('hidden');
         }
         reader.readAsDataURL(input.files[0]);
     }
 }
 
-function removeImage() {
-    document.getElementById('productImagen').value = '';
-    document.getElementById('imagePreviewContainer').classList.add('hidden');
-    currentImageUrl = null;
+function removeImage(n) {
+    const suffix = n === 1 ? '' : n;
+    const inputId = n === 1 ? 'productImagen' : 'productImagen' + n;
+    document.getElementById(inputId).value = '';
+    document.getElementById('imagePreviewContainer' + suffix).classList.add('hidden');
+    currentImageUrls[n] = null;
 }
 
 async function editProduct(id) {
     try {
         const response = await fetch(`${API_URL}?action=get&id=${id}`);
         const data = await response.json();
-        
+
         if (data.success) {
             const product = data.data;
             document.getElementById('productId').value = product.id;
@@ -309,16 +353,37 @@ async function editProduct(id) {
             document.getElementById('productCategoria').value = product.id_categoria;
             document.getElementById('productPrecio').value = product.precio;
             document.getElementById('productStock').value = product.stock;
-            
+
+            // Imagen principal
             if (product.imagen_url) {
                 document.getElementById('imagePreview').src = product.imagen_url;
                 document.getElementById('imagePreviewContainer').classList.remove('hidden');
-                currentImageUrl = product.imagen_url;
+                currentImageUrls[1] = product.imagen_url;
             } else {
                 document.getElementById('imagePreviewContainer').classList.add('hidden');
-                currentImageUrl = null;
+                currentImageUrls[1] = null;
             }
-            
+
+            // Imagen 2
+            if (product.imagen_url_2) {
+                document.getElementById('imagePreview2').src = product.imagen_url_2;
+                document.getElementById('imagePreviewContainer2').classList.remove('hidden');
+                currentImageUrls[2] = product.imagen_url_2;
+            } else {
+                document.getElementById('imagePreviewContainer2').classList.add('hidden');
+                currentImageUrls[2] = null;
+            }
+
+            // Imagen 3
+            if (product.imagen_url_3) {
+                document.getElementById('imagePreview3').src = product.imagen_url_3;
+                document.getElementById('imagePreviewContainer3').classList.remove('hidden');
+                currentImageUrls[3] = product.imagen_url_3;
+            } else {
+                document.getElementById('imagePreviewContainer3').classList.add('hidden');
+                currentImageUrls[3] = null;
+            }
+
             openModal(true);
         } else {
             alert('Error: ' + data.message);

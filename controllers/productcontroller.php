@@ -60,7 +60,7 @@ class ProductController {
             return ['success' => false, 'message' => 'El stock no puede ser negativo'];
         }
 
-        // Procesar imagen si se subió
+        // Procesar imagen principal
         $imagen_url = null;
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
             $uploadResult = $this->uploadImage($_FILES['imagen']);
@@ -70,12 +70,34 @@ class ProductController {
             $imagen_url = $uploadResult['url'];
         }
 
+        // Procesar imagen 2
+        $imagen_url_2 = null;
+        if (isset($_FILES['imagen_2']) && $_FILES['imagen_2']['error'] === UPLOAD_ERR_OK) {
+            $uploadResult = $this->uploadImage($_FILES['imagen_2']);
+            if (!$uploadResult['success']) {
+                return $uploadResult;
+            }
+            $imagen_url_2 = $uploadResult['url'];
+        }
+
+        // Procesar imagen 3
+        $imagen_url_3 = null;
+        if (isset($_FILES['imagen_3']) && $_FILES['imagen_3']['error'] === UPLOAD_ERR_OK) {
+            $uploadResult = $this->uploadImage($_FILES['imagen_3']);
+            if (!$uploadResult['success']) {
+                return $uploadResult;
+            }
+            $imagen_url_3 = $uploadResult['url'];
+        }
+
         // Crear producto
         $this->productModel->id_usuario = $_SESSION['user_id'];
         $this->productModel->id_categoria = $id_categoria;
         $this->productModel->nombre = $nombre;
         $this->productModel->descripcion = $descripcion;
         $this->productModel->imagen_url = $imagen_url;
+        $this->productModel->imagen_url_2 = $imagen_url_2;
+        $this->productModel->imagen_url_3 = $imagen_url_3;
         $this->productModel->stock = $stock;
         $this->productModel->precio = $precio;
 
@@ -132,19 +154,43 @@ class ProductController {
             return ['success' => false, 'message' => 'Producto no encontrado'];
         }
 
-        // Procesar nueva imagen si se subió
+        // Procesar imagen principal
         $imagen_url = $producto['imagen_url'];
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-            // Eliminar imagen anterior si existe
             if (!empty($producto['imagen_url'])) {
                 $this->bunnyStorage->delete($producto['imagen_url']);
             }
-            
             $uploadResult = $this->uploadImage($_FILES['imagen']);
             if (!$uploadResult['success']) {
                 return $uploadResult;
             }
             $imagen_url = $uploadResult['url'];
+        }
+
+        // Procesar imagen 2
+        $imagen_url_2 = $producto['imagen_url_2'] ?? null;
+        if (isset($_FILES['imagen_2']) && $_FILES['imagen_2']['error'] === UPLOAD_ERR_OK) {
+            if (!empty($producto['imagen_url_2'])) {
+                $this->bunnyStorage->delete($producto['imagen_url_2']);
+            }
+            $uploadResult = $this->uploadImage($_FILES['imagen_2']);
+            if (!$uploadResult['success']) {
+                return $uploadResult;
+            }
+            $imagen_url_2 = $uploadResult['url'];
+        }
+
+        // Procesar imagen 3
+        $imagen_url_3 = $producto['imagen_url_3'] ?? null;
+        if (isset($_FILES['imagen_3']) && $_FILES['imagen_3']['error'] === UPLOAD_ERR_OK) {
+            if (!empty($producto['imagen_url_3'])) {
+                $this->bunnyStorage->delete($producto['imagen_url_3']);
+            }
+            $uploadResult = $this->uploadImage($_FILES['imagen_3']);
+            if (!$uploadResult['success']) {
+                return $uploadResult;
+            }
+            $imagen_url_3 = $uploadResult['url'];
         }
 
         // Actualizar
@@ -153,6 +199,8 @@ class ProductController {
         $this->productModel->nombre = $nombre;
         $this->productModel->descripcion = $descripcion;
         $this->productModel->imagen_url = $imagen_url;
+        $this->productModel->imagen_url_2 = $imagen_url_2;
+        $this->productModel->imagen_url_3 = $imagen_url_3;
         $this->productModel->stock = $stock;
         $this->productModel->precio = $precio;
 
@@ -269,6 +317,72 @@ class ProductController {
     }
 
     /**
+     * Eliminar imagen 2
+     */
+    public function deleteImage2() {
+        if (!isAdmin()) {
+            return ['success' => false, 'message' => 'No autorizado'];
+        }
+
+        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            return ['success' => false, 'message' => 'Token de seguridad inválido'];
+        }
+
+        $id = intval($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            return ['success' => false, 'message' => 'ID inválido'];
+        }
+
+        $producto = $this->productModel->getById($id);
+        if (!$producto) {
+            return ['success' => false, 'message' => 'Producto no encontrado'];
+        }
+
+        if (!empty($producto['imagen_url_2'])) {
+            $this->bunnyStorage->delete($producto['imagen_url_2']);
+        }
+
+        if ($this->productModel->updateImage2($id, null)) {
+            return ['success' => true, 'message' => 'Imagen 2 eliminada correctamente'];
+        }
+
+        return ['success' => false, 'message' => 'Error al eliminar la imagen'];
+    }
+
+    /**
+     * Eliminar imagen 3
+     */
+    public function deleteImage3() {
+        if (!isAdmin()) {
+            return ['success' => false, 'message' => 'No autorizado'];
+        }
+
+        if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
+            return ['success' => false, 'message' => 'Token de seguridad inválido'];
+        }
+
+        $id = intval($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            return ['success' => false, 'message' => 'ID inválido'];
+        }
+
+        $producto = $this->productModel->getById($id);
+        if (!$producto) {
+            return ['success' => false, 'message' => 'Producto no encontrado'];
+        }
+
+        if (!empty($producto['imagen_url_3'])) {
+            $this->bunnyStorage->delete($producto['imagen_url_3']);
+        }
+
+        if ($this->productModel->updateImage3($id, null)) {
+            return ['success' => true, 'message' => 'Imagen 3 eliminada correctamente'];
+        }
+
+        return ['success' => false, 'message' => 'Error al eliminar la imagen'];
+    }
+
+    /**
      * Subir y comprimir imagen
      */
     private function uploadImage($file) {
@@ -323,6 +437,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET
             break;
         case 'delete_image':
             $response = $controller->deleteImage();
+            break;
+        case 'delete_image_2':
+            $response = $controller->deleteImage2();
+            break;
+        case 'delete_image_3':
+            $response = $controller->deleteImage3();
             break;
     }
 

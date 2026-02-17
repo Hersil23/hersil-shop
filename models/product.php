@@ -17,6 +17,8 @@ class Product {
     public $nombre;
     public $descripcion;
     public $imagen_url;
+    public $imagen_url_2;
+    public $imagen_url_3;
     public $stock;
     public $precio;
     public $eliminado;
@@ -28,12 +30,14 @@ class Product {
 
     // Crear nuevo producto
     public function create() {
-        $query = "INSERT INTO " . $this->table . " 
+        $query = "INSERT INTO " . $this->table . "
                   SET id_usuario = :id_usuario,
                       id_categoria = :id_categoria,
                       nombre = :nombre,
                       descripcion = :descripcion,
                       imagen_url = :imagen_url,
+                      imagen_url_2 = :imagen_url_2,
+                      imagen_url_3 = :imagen_url_3,
                       stock = :stock,
                       precio = :precio";
 
@@ -47,6 +51,8 @@ class Product {
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':descripcion', $this->descripcion);
         $stmt->bindParam(':imagen_url', $this->imagen_url);
+        $stmt->bindParam(':imagen_url_2', $this->imagen_url_2);
+        $stmt->bindParam(':imagen_url_3', $this->imagen_url_3);
         $stmt->bindParam(':stock', $this->stock);
         $stmt->bindParam(':precio', $this->precio);
 
@@ -126,11 +132,13 @@ class Product {
 
     // Actualizar producto
     public function update() {
-        $query = "UPDATE " . $this->table . " 
+        $query = "UPDATE " . $this->table . "
                   SET id_categoria = :id_categoria,
                       nombre = :nombre,
                       descripcion = :descripcion,
                       imagen_url = :imagen_url,
+                      imagen_url_2 = :imagen_url_2,
+                      imagen_url_3 = :imagen_url_3,
                       stock = :stock,
                       precio = :precio
                   WHERE id = :id";
@@ -144,6 +152,8 @@ class Product {
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':descripcion', $this->descripcion);
         $stmt->bindParam(':imagen_url', $this->imagen_url);
+        $stmt->bindParam(':imagen_url_2', $this->imagen_url_2);
+        $stmt->bindParam(':imagen_url_3', $this->imagen_url_3);
         $stmt->bindParam(':stock', $this->stock);
         $stmt->bindParam(':precio', $this->precio);
         $stmt->bindParam(':id', $this->id);
@@ -153,12 +163,38 @@ class Product {
 
     // Actualizar solo la imagen
     public function updateImage($id, $imagen_url) {
-        $query = "UPDATE " . $this->table . " 
-                  SET imagen_url = :imagen_url 
+        $query = "UPDATE " . $this->table . "
+                  SET imagen_url = :imagen_url
                   WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':imagen_url', $imagen_url);
+        $stmt->bindParam(':id', $id);
+
+        return $stmt->execute();
+    }
+
+    // Actualizar imagen 2
+    public function updateImage2($id, $imagen_url_2) {
+        $query = "UPDATE " . $this->table . "
+                  SET imagen_url_2 = :imagen_url_2
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':imagen_url_2', $imagen_url_2);
+        $stmt->bindParam(':id', $id);
+
+        return $stmt->execute();
+    }
+
+    // Actualizar imagen 3
+    public function updateImage3($id, $imagen_url_3) {
+        $query = "UPDATE " . $this->table . "
+                  SET imagen_url_3 = :imagen_url_3
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':imagen_url_3', $imagen_url_3);
         $stmt->bindParam(':id', $id);
 
         return $stmt->execute();

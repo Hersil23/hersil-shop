@@ -1,9 +1,8 @@
 <?php
-$page_title = "Detalle del Producto";
-require_once __DIR__ . '/../layouts/header.php';
+require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../models/product.php';
 
-// Verificar que se recibió el ID
+// Cargar producto ANTES del header para poder usar sus datos en OG meta tags
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     $_SESSION['error'] = "Producto no encontrado";
     redirect('/public/productos');
@@ -13,16 +12,28 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $productModel = new Product();
 $product = $productModel->getById(intval($_GET['id']));
 
-// Verificar que el producto existe
 if (!$product) {
     $_SESSION['error'] = "Producto no encontrado";
     redirect('/public/productos');
     exit;
 }
 
+// Definir variable para OG meta tags en el header
+$og_product = [
+    'title' => $product['nombre'],
+    'description' => substr($product['descripcion'], 0, 200),
+    'image' => $product['imagen_url'] ?? '',
+    'url' => BASE_URL . '/producto?id=' . $product['id'],
+    'price' => number_format($product['precio'], 2)
+];
+
+$page_title = htmlspecialchars($product['nombre']);
+require_once __DIR__ . '/../layouts/header.php';
+
 // Crear mensaje para WhatsApp
 $whatsapp_message = "Hola, estoy interesado en el producto: *" . $product['nombre'] . "* - Precio: $" . number_format($product['precio'], 2);
 $whatsapp_url = "https://wa.me/584145116337?text=" . urlencode($whatsapp_message);
+$product_url = BASE_URL . '/producto?id=' . $product['id'];
 ?>
 
 <div class="bg-slate-50 dark:bg-slate-900/50 min-h-screen py-8">
@@ -42,10 +53,16 @@ $whatsapp_url = "https://wa.me/584145116337?text=" . urlencode($whatsapp_message
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             <!-- Imagen del producto -->
+            <?php
+            $images = [];
+            if (!empty($product['imagen_url'])) $images[] = $product['imagen_url'];
+            if (!empty($product['imagen_url_2'])) $images[] = $product['imagen_url_2'];
+            if (!empty($product['imagen_url_3'])) $images[] = $product['imagen_url_3'];
+            ?>
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
                 <div class="aspect-square bg-slate-100 dark:bg-slate-700 rounded-xl overflow-hidden">
-                    <?php if (!empty($product['imagen_url'])): ?>
-                        <img src="<?php echo htmlspecialchars($product['imagen_url']); ?>" 
+                    <?php if (!empty($images)): ?>
+                        <img id="mainProductImage" src="<?php echo htmlspecialchars($images[0]); ?>"
                              alt="<?php echo htmlspecialchars($product['nombre']); ?>"
                              class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
                     <?php else: ?>
@@ -54,6 +71,16 @@ $whatsapp_url = "https://wa.me/584145116337?text=" . urlencode($whatsapp_message
                         </div>
                     <?php endif; ?>
                 </div>
+                <?php if (count($images) > 1): ?>
+                <div class="flex gap-3 mt-4">
+                    <?php foreach ($images as $index => $img): ?>
+                    <button onclick="document.getElementById('mainProductImage').src='<?php echo htmlspecialchars($img); ?>'; document.querySelectorAll('.thumb-btn').forEach(b=>b.classList.remove('ring-2','ring-blue-500')); this.classList.add('ring-2','ring-blue-500');"
+                            class="thumb-btn w-20 h-20 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 hover:opacity-80 transition-opacity <?php echo $index === 0 ? 'ring-2 ring-blue-500' : ''; ?>">
+                        <img src="<?php echo htmlspecialchars($img); ?>" alt="Imagen <?php echo $index + 1; ?>" class="w-full h-full object-cover">
+                    </button>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
 
             <!-- Información del producto -->
@@ -65,9 +92,25 @@ $whatsapp_url = "https://wa.me/584145116337?text=" . urlencode($whatsapp_message
                 </span>
 
                 <!-- Nombre -->
-                <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                <h1 class="text-3xl md:text-4xl font-bold mb-2">
                     <?php echo htmlspecialchars($product['nombre']); ?>
                 </h1>
+
+                <!-- Compartir -->
+                <div class="flex items-center gap-2 mb-4">
+                    <button onclick="shareProduct('<?php echo htmlspecialchars($product_url, ENT_QUOTES); ?>', '<?php echo htmlspecialchars(addslashes($product['nombre']), ENT_QUOTES); ?>')"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                            title="Copiar enlace">
+                        <i class="fas fa-link"></i>
+                        <span>Copiar enlace</span>
+                    </button>
+                    <button onclick="shareWhatsApp('<?php echo htmlspecialchars($product_url, ENT_QUOTES); ?>', '<?php echo htmlspecialchars(addslashes($product['nombre']), ENT_QUOTES); ?>')"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                            title="Compartir por WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Compartir</span>
+                    </button>
+                </div>
 
                 <!-- Precio y Stock -->
                 <div class="flex items-center gap-6 mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
